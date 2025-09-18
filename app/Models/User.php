@@ -6,43 +6,90 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $table = 'usuarios';
+    protected $primaryKey = 'IDUsuario';
+    
+    // Eager load the role relationship by default
+    protected $with = ['role'];
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'IDRol',
+        'TipoIdentificacion',
+        'NumeroIdentificacion',
+        'Nombre',
+        'Apellido',
+        'Email',
+        'Telefono',
+        'FechaNacimiento',
+        'Direccion',
+        'Contrasena',
+        'UrlImagen'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'Contrasena',
+        'remember_token'
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'FechaNacimiento' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function getAuthPassword()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->Contrasena;
+    }
+
+    public function getAuthPasswordName()
+    {
+        return 'Contrasena';
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->Email;
+    }
+
+    public function getAuthIdentifierName()
+    {
+        return 'Email';
+    }
+
+    public function getAuthIdentifier()
+    {
+        return $this->Email;
+    }
+
+    // Método eliminado para evitar doble encriptación
+    // La encriptación se maneja manualmente en el controlador
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'IDRol', 'IDRol');
+    }
+
+    public function fincas()
+    {
+        return $this->belongsToMany(Finca::class, 'usuario_finca', 'IDUsuario', 'IDFinca')
+                    ->withPivot('rol_en_finca');
+    }
+
+    public function hasRole($roleName)
+    {
+        return $this->role && $this->role->NombreRol === $roleName;
+    }
+
+    public function getRoleName()
+    {
+        return $this->role ? $this->role->NombreRol : null;
     }
 }

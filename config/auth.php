@@ -1,6 +1,9 @@
 <?php
 
 return [
+    // Configuración personalizada para los campos de autenticación
+    'username' => 'Email',
+    'password' => 'Contrasena',
 
     /*
     |--------------------------------------------------------------------------
