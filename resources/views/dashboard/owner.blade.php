@@ -1,9 +1,10 @@
-@extends('layouts.app')
+@extends('layouts.app-with-sidebar')
 
 @section('title', 'Dashboard Propietario - Gepro Avícola')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="p-6">
+    <div class="max-w-7xl mx-auto">
     <!-- Header con botón de logout -->
     <div class="flex justify-between items-center mb-6">
         <div>

@@ -33,6 +33,11 @@ Route::middleware('auth')->group(function () {
     // Dashboard general
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
     
+    // Ruta de ejemplo para demostrar la sincronización navbar-sidebar
+    Route::get('/example-sidebar', function () {
+        return view('example-with-sidebar');
+    })->name('example.sidebar');
+    
     // Dashboards específicos por rol
     Route::get('/admin/dashboard', function () {
         return view('dashboard.admin', ['statistics' => app(\App\Services\DashboardService::class)->getStatistics()]);

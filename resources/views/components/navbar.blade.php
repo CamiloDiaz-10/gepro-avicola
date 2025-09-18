@@ -1,13 +1,34 @@
 @props([
     'title' => 'Gepro Avícola',
-    'showUserInfo' => true
+    'showUserInfo' => true,
+    'showHamburger' => true
 ])
 
-<nav class="bg-white shadow-lg border-b border-gray-200">
+<nav class="bg-white shadow-lg border-b border-gray-200 fixed top-0 left-0 right-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <!-- Logo y título -->
+            <!-- Hamburger button y Logo -->
             <div class="flex items-center">
+                @if($showHamburger)
+                <!-- Botón hamburguesa para móvil -->
+                <button @click="sidebarOpen = !sidebarOpen" 
+                        class="md:hidden mr-3 p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                    <span class="sr-only">Abrir menú</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                
+                <!-- Botón hamburguesa para desktop (sidebar colapsible) -->
+                <button @click="sidebarCollapsed = !sidebarCollapsed" 
+                        class="hidden md:block mr-3 p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                    <span class="sr-only">Toggle sidebar</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                @endif
+                
                 <div class="flex-shrink-0 flex items-center">
                     <svg class="w-8 h-8 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 2L3 7v11a1 1 0 001 1h3v-7h6v7h3a1 1 0 001-1V7l-7-5z"/>
@@ -80,5 +101,4 @@
     </div>
 </nav>
 
-<!-- Alpine.js para el dropdown -->
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<!-- Alpine.js se carga en el layout principal -->

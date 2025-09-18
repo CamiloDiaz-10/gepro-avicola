@@ -1,30 +1,25 @@
-@extends('layouts.app')
+@extends('layouts.app-with-sidebar')
 
 @section('title', 'Dashboard Administrador - Gepro Avícola')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Header con botón de logout -->
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-semibold text-gray-900">Panel de Administración</h1>
-            <p class="text-gray-600 mt-1">Bienvenido, {{ auth()->user()->Nombre }} {{ auth()->user()->Apellido }}</p>
+<div class="p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-semibold text-gray-900">Panel de Administración</h1>
+                <p class="text-gray-600 mt-1">Bienvenido, {{ auth()->user()->Nombre }} {{ auth()->user()->Apellido }}</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    Administrador
+                </span>
+            </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                Administrador
-            </span>
-            <x-logout-button 
-                size="normal"
-                confirmMessage="¿Estás seguro de que deseas cerrar sesión como administrador?"
-            >
-                Cerrar Sesión
-            </x-logout-button>
-        </div>
-    </div>
 
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center">
                 <div class="p-3 rounded-full bg-indigo-600 bg-opacity-75">
