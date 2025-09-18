@@ -25,16 +25,18 @@ class HomeController extends Controller
     {
         $user = auth()->user();
         $role = $user->role ? $user->role->NombreRol : null;
-        $statistics = $this->dashboardService->getStatistics();
 
+        // Redirigir a los dashboards específicos según el rol
         switch ($role) {
             case 'Administrador':
-                return view('dashboard.admin', compact('statistics'));
+                return redirect()->route('admin.dashboard');
             case 'Propietario':
-                return view('dashboard.owner', compact('statistics'));
+                return redirect()->route('owner.dashboard');
             case 'Empleado':
-                return view('dashboard.employee', compact('statistics'));
+                return redirect()->route('employee.dashboard');
             default:
+                // Para usuarios sin rol específico, mostrar dashboard básico
+                $statistics = $this->dashboardService->getStatistics();
                 return view('dashboard', compact('statistics'));
         }
     }

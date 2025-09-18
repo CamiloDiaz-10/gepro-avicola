@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\Admin\UserController;
 // Controladores comentados hasta crearlos:
 // use App\Http\Controllers\UserController;
 // use App\Http\Controllers\RoleController;
@@ -39,9 +41,7 @@ Route::middleware('auth')->group(function () {
     })->name('example.sidebar');
     
     // Dashboards específicos por rol
-    Route::get('/admin/dashboard', function () {
-        return view('dashboard.admin', ['statistics' => app(\App\Services\DashboardService::class)->getStatistics()]);
-    })->name('admin.dashboard')->middleware('role:Administrador');
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard')->middleware('role:Administrador');
     
     Route::get('/owner/dashboard', function () {
         return view('dashboard.owner', ['statistics' => app(\App\Services\DashboardService::class)->getStatistics()]);
@@ -59,15 +59,25 @@ Route::middleware('auth')->group(function () {
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     });
     
-    // Rutas específicas para administradores (comentadas hasta crear los controladores)
-    /*
-    Route::middleware(['role:Administrador'])->group(function () {
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    // Rutas específicas para administradores
+    Route::middleware(['role:Administrador'])->prefix('admin')->name('admin.')->group(function () {
+        // Gestión de usuarios
+        Route::resource('users', UserController::class);
+        Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::patch('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+        
+        // Otras rutas administrativas (comentadas hasta crear los controladores)
+        /*
         Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
         Route::get('/system/logs', [SystemController::class, 'logs'])->name('system.logs');
+        Route::resource('fincas', FincaController::class);
+        Route::resource('lotes', LoteController::class);
+        Route::resource('gallinas', GallinaController::class);
+        */
     });
     
     // Rutas específicas para propietarios (comentadas hasta crear los controladores)
+    /*
     Route::middleware(['role:Propietario'])->group(function () {
         Route::resource('fincas', FincaController::class);
         Route::resource('birds', BirdController::class);

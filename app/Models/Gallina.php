@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Bird extends Model
+class Gallina extends Model
 {
     use HasFactory;
 
     protected $table = 'gallinas';
     protected $primaryKey = 'IDGallina';
-
+    
     protected $fillable = [
         'IDLote',
         'IDTipoGallina',
@@ -38,7 +38,14 @@ class Bird extends Model
 
     public function produccionHuevos()
     {
-        return $this->hasMany(ProduccionHuevos::class, 'IDGallina', 'IDGallina');
+        return $this->hasManyThrough(
+            ProduccionHuevos::class,
+            Lote::class,
+            'IDLote', // Foreign key on lotes table
+            'IDLote', // Foreign key on produccion_huevos table
+            'IDLote', // Local key on gallinas table
+            'IDLote'  // Local key on lotes table
+        );
     }
 
     public function celos()
@@ -78,23 +85,17 @@ class Bird extends Model
         return $this->edad_en_dias >= 150; // 5 meses aproximadamente
     }
 
-    // Statistics methods
-    public static function getTotalBirdsCount()
+    // Static methods
+    public static function getTotalCount()
     {
         return static::count();
     }
 
-    public static function getBirdsByStatus()
+    public static function getCountByStatus()
     {
         return static::selectRaw('Estado as status, COUNT(*) as total')
             ->groupBy('Estado')
             ->get();
-    }
-
-    public static function getRecentAcquisitions($days = 7)
-    {
-        return static::where('created_at', '>=', now()->subDays($days))
-            ->count();
     }
 
     public static function getCountByType()
@@ -103,5 +104,10 @@ class Bird extends Model
             ->selectRaw('IDTipoGallina, COUNT(*) as total')
             ->groupBy('IDTipoGallina')
             ->get();
+    }
+
+    public static function getRecentAcquisitions($days = 7)
+    {
+        return static::where('created_at', '>=', now()->subDays($days))->count();
     }
 }

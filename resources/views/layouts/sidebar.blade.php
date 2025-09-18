@@ -24,8 +24,32 @@
     <nav class="p-4">
         <ul class="space-y-2">
             <li>
-                <a href="{{ route('dashboard') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('dashboard') ? 'bg-blue-800' : '' }}"
+                @php
+                    $dashboardRoute = 'dashboard';
+                    $isActive = false;
+                    
+                    if (auth()->check() && auth()->user()->role) {
+                        switch (auth()->user()->role->NombreRol) {
+                            case 'Administrador':
+                                $dashboardRoute = 'admin.dashboard';
+                                $isActive = request()->routeIs('admin.dashboard');
+                                break;
+                            case 'Propietario':
+                                $dashboardRoute = 'owner.dashboard';
+                                $isActive = request()->routeIs('owner.dashboard');
+                                break;
+                            case 'Empleado':
+                                $dashboardRoute = 'employee.dashboard';
+                                $isActive = request()->routeIs('employee.dashboard');
+                                break;
+                            default:
+                                $isActive = request()->routeIs('dashboard');
+                        }
+                    }
+                @endphp
+                
+                <a href="{{ route($dashboardRoute) }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ $isActive ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
                     <i class="fas fa-home" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
                     <span class="transition-opacity duration-300" 
@@ -35,6 +59,78 @@
                     <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Inicio</span>
                 </a>
             </li>
+
+            <!-- Opciones específicas para Administradores -->
+            @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Administrador')
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Administración
+                </div>
+            </li>
+
+            <li>
+                <a href="{{ route('admin.users.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.users.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-users" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Gestionar Usuarios
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestionar Usuarios</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
+                   onclick="alert('Próximamente: Gestión de Fincas')">
+                    <i class="fas fa-warehouse" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Gestionar Fincas
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestionar Fincas</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
+                   onclick="alert('Próximamente: Gestión de Lotes')">
+                    <i class="fas fa-layer-group" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Gestionar Lotes
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestionar Lotes</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
+                   onclick="alert('Próximamente: Sistema de Reportes')">
+                    <i class="fas fa-chart-bar" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Reportes Avanzados
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Reportes Avanzados</span>
+                </a>
+            </li>
+
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Operaciones
+                </div>
+            </li>
+            @endif
 
             <li>
                 <a href="#" 

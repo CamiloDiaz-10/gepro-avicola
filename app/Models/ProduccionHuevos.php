@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class EggProduction extends Model
+class ProduccionHuevos extends Model
 {
     use HasFactory;
 
     protected $table = 'produccion_huevos';
     protected $primaryKey = 'IDProduccion';
-
+    
     protected $fillable = [
         'IDLote',
         'IDUsuario',
