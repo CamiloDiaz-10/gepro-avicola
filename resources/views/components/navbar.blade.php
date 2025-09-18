@@ -4,8 +4,13 @@
     'showHamburger' => true
 ])
 
-<nav class="bg-white shadow-lg border-b border-gray-200 fixed top-0 left-0 right-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<nav class="bg-white shadow-lg border-b border-gray-200 fixed top-0 right-0 z-40 transition-all duration-300 ease-in-out"
+     :class="{
+         'left-0': window.innerWidth < 768,
+         'left-64': !sidebarCollapsed && window.innerWidth >= 768,
+         'left-16': sidebarCollapsed && window.innerWidth >= 768
+     }">
+    <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- Hamburger button y Logo -->
             <div class="flex items-center">
@@ -30,10 +35,10 @@
                 @endif
                 
                 <div class="flex-shrink-0 flex items-center">
-                    <svg class="w-8 h-8 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 2L3 7v11a1 1 0 001 1h3v-7h6v7h3a1 1 0 001-1V7l-7-5z"/>
-                    </svg>
-                    <h1 class="text-xl font-bold text-gray-900">{{ $title }}</h1>
+                    <img src="{{ asset('images/home2.png') }}" alt="Logo" class="w-12 h-12">
+                    <div class="ml-2">
+                        <h1 class="text-xl font-bold text-gray-900">{{   $title }}</h1>
+                    </div>
                 </div>
             </div>
 
