@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FincaController;
 use App\Http\Controllers\Admin\LoteController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SanidadController;
 // Controladores comentados hasta crearlos:
 // use App\Http\Controllers\UserController;
 // use App\Http\Controllers\RoleController;
@@ -78,6 +79,9 @@ Route::middleware('auth')->group(function () {
         Route::get('reports/export/feeding', [ReportController::class, 'exportFeeding'])->name('reports.export.feeding');
         Route::get('reports/export/health', [ReportController::class, 'exportHealth'])->name('reports.export.health');
         Route::get('reports/export/finance', [ReportController::class, 'exportFinance'])->name('reports.export.finance');
+        
+        // Gestión de tratamientos (sanidad)
+        Route::resource('sanidad', SanidadController::class);
         
         // Otras rutas administrativas (comentadas hasta crear los controladores)
         /*

@@ -205,10 +205,17 @@
                         @endforeach
                     </div>
 
+                    <div class="mt-4 pt-4 border-t">
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>Costo Sanitario Estimado (30 días)</span>
+                            <span class="font-semibold">${{ number_format($statistics['health']['estimated_cost_30d'] ?? 0) }}</span>
+                        </div>
+                    </div>
+
                     <div class="mt-4">
-                        <button class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors">
+                        <a href="{{ route('admin.sanidad.create') }}" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors">
                             <i class="fas fa-heartbeat mr-2"></i>Registrar Tratamiento
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -221,28 +228,39 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Resumen Financiero (30 días)</h3>
                 
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center p-4 bg-green-50 rounded-lg">
-                        <div>
-                            <p class="text-sm text-green-600">Ingresos por Ventas</p>
-                            <p class="text-2xl font-bold text-green-800">${{ number_format($statistics['financial']['sales']) }}</p>
-                        </div>
-                        <i class="fas fa-arrow-up text-green-600 fa-2x"></i>
-                    </div>
-
-                    <div class="flex justify-between items-center p-4 bg-red-50 rounded-lg">
-                        <div>
-                            <p class="text-sm text-red-600">Gastos en Compras</p>
-                            <p class="text-2xl font-bold text-red-800">${{ number_format($statistics['financial']['purchases']) }}</p>
-                        </div>
-                        <i class="fas fa-arrow-down text-red-600 fa-2x"></i>
-                    </div>
-
                     <div class="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
                         <div>
-                            <p class="text-sm text-blue-600">Ingresos Totales</p>
+                            <p class="text-sm text-blue-600">Ingresos (estimados)</p>
                             <p class="text-2xl font-bold text-blue-800">${{ number_format($statistics['financial']['revenue']) }}</p>
                         </div>
-                        <i class="fas fa-chart-line text-blue-600 fa-2x"></i>
+                        <i class="fas fa-arrow-up text-blue-600 fa-2x"></i>
+                    </div>
+
+                    <div class="flex justify-between items-center p-4 bg-yellow-50 rounded-lg">
+                        <div>
+                            <p class="text-sm text-yellow-700">Gastos (estimados)</p>
+                            <p class="text-2xl font-bold text-yellow-800">${{ number_format($statistics['financial']['estimated_expenses_30d']) }}</p>
+                        </div>
+                        <i class="fas fa-arrow-down text-yellow-600 fa-2x"></i>
+                    </div>
+
+                    <div class="flex justify-between items-center p-4 bg-green-50 rounded-lg">
+                        <div>
+                            <p class="text-sm text-green-600">Neto (30 días)</p>
+                            <p class="text-2xl font-bold text-green-800">${{ number_format($statistics['financial']['estimated_net_30d']) }}</p>
+                        </div>
+                        <i class="fas fa-wallet text-green-600 fa-2x"></i>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-gray-50 rounded">
+                            <p class="text-xs text-gray-500">Movimientos de Venta</p>
+                            <p class="text-lg font-semibold text-gray-800">{{ number_format($statistics['financial']['sales']) }}</p>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded">
+                            <p class="text-xs text-gray-500">Movimientos de Compra</p>
+                            <p class="text-lg font-semibold text-gray-800">{{ number_format($statistics['financial']['purchases']) }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -272,10 +290,18 @@
                         @endforeach
                     </div>
 
-                    <div class="mt-4 pt-4 border-t">
+                    <div class="mt-4 pt-4 border-t space-y-2">
                         <div class="flex justify-between text-sm text-gray-600">
-                            <span>Costo Total Alimentación</span>
-                            <span class="font-semibold">${{ number_format($statistics['feeding']['costs']->total_cost ?? 0) }}</span>
+                            <span>Costo Alimentación (7 días)</span>
+                            <span class="font-semibold">${{ number_format($statistics['feeding']['estimated_costs']['total_cost_7d'] ?? 0) }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>Costo Alimentación (30 días)</span>
+                            <span class="font-semibold">${{ number_format($statistics['feeding']['estimated_costs']['total_cost_30d'] ?? 0) }}</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>Precio por kg (config)</span>
+                            <span>${{ number_format($statistics['feeding']['estimated_costs']['price_per_kg'] ?? 0) }}</span>
                         </div>
                     </div>
 

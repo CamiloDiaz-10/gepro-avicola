@@ -45,7 +45,10 @@ class AdminDashboardController extends Controller
             'active_lots' => $this->safeCount('lotes'), // Todos los lotes por ahora
             'today_production' => $this->getTodayEggProduction(),
             'pending_health_alerts' => $this->getPendingHealthAlerts(),
-            'low_stock_feeds' => $this->getLowStockFeeds()
+            'low_stock_feeds' => $this->getLowStockFeeds(),
+            // Resumen financiero
+            'estimated_total_expenses_30d' => $this->getTotalExpenses(30),
+            'estimated_net_revenue_30d' => $this->getFinancialStats()['revenue'] - $this->getTotalExpenses(30),
         ];
     }
 
@@ -145,62 +148,115 @@ class AdminDashboardController extends Controller
     private function getHealthStats()
     {
         if (!Schema::hasTable('sanidad')) {
-            return ['treatments' => [], 'vaccinations' => [], 'mortality' => []];
+            return [
+                'treatments' => [],
+                'vaccinations' => 0,
+                'mortality' => [],
+                'estimated_cost_30d' => 0,
+            ];
         }
 
+        $treatments30d = DB::table('sanidad')
+            ->select('TipoTratamiento as treatment', DB::raw('count(*) as total'))
+            ->where('Fecha', '>=', now()->subDays(30))
+            ->groupBy('TipoTratamiento')
+            ->get();
+
+        $estimatedHealthCost30d = $this->estimateHealthCosts($treatments30d);
+
         return [
-            'treatments' => DB::table('sanidad')
-                ->select('TipoTratamiento as treatment', DB::raw('count(*) as total'))
-                ->where('Fecha', '>=', now()->subDays(30))
-                ->groupBy('TipoTratamiento')
-                ->get(),
+            'treatments' => $treatments30d,
             'vaccinations' => DB::table('sanidad')
                 ->where('TipoTratamiento', 'Vacuna')
                 ->where('Fecha', '>=', now()->subDays(30))
                 ->count(),
-            'mortality' => $this->getMortalityStats()
+            'mortality' => $this->getMortalityStats(),
+            'estimated_cost_30d' => $estimatedHealthCost30d,
         ];
     }
 
     private function getFeedingStats()
     {
         if (!Schema::hasTable('alimentacion')) {
-            return ['consumption' => [], 'by_feed_type' => [], 'costs' => []];
+            return [
+                'consumption' => [],
+                'by_feed_type' => [],
+                'estimated_costs' => [
+                    'total_cost_7d' => 0,
+                    'total_cost_30d' => 0,
+                    'price_per_kg' => (float) config('gepro.feed_price_per_kg', 0),
+                ],
+            ];
         }
 
+        $pricePerKg = (float) config('gepro.feed_price_per_kg', 0);
+
+        $consumption7d = DB::table('alimentacion')
+            ->select('Fecha as date', DB::raw('SUM(CantidadKg) as total'))
+            ->where('Fecha', '>=', now()->subDays(7))
+            ->groupBy('Fecha')
+            ->orderBy('Fecha')
+            ->get();
+
+        $byFeedType30d = DB::table('alimentacion')
+            ->leftJoin('tipo_alimentos', 'alimentacion.IDTipoAlimento', '=', 'tipo_alimentos.IDTipoAlimento')
+            ->select(DB::raw('COALESCE(tipo_alimentos.Nombre, "Sin tipo") as feed_type'), DB::raw('SUM(CantidadKg) as total'))
+            ->where('alimentacion.Fecha', '>=', now()->subDays(30))
+            ->groupBy(DB::raw('COALESCE(tipo_alimentos.Nombre, "Sin tipo")'))
+            ->get();
+
+        $totalKg30d = DB::table('alimentacion')
+            ->where('Fecha', '>=', now()->subDays(30))
+            ->sum('CantidadKg');
+
+        $estimatedCost7d = array_sum(array_map(function ($row) use ($pricePerKg) {
+            return ((float) $row->total) * $pricePerKg;
+        }, $consumption7d->toArray()));
+
+        $estimatedCost30d = ((float) $totalKg30d) * $pricePerKg;
+
         return [
-            'consumption' => DB::table('alimentacion')
-                ->select('Fecha as date', DB::raw('SUM(CantidadKg) as total'))
-                ->where('Fecha', '>=', now()->subDays(7))
-                ->groupBy('Fecha')
-                ->orderBy('Fecha')
-                ->get(),
-            'by_feed_type' => DB::table('alimentacion')
-                ->join('tipo_alimentos', 'alimentacion.IDTipoAlimento', '=', 'tipo_alimentos.IDTipoAlimento')
-                ->select('tipo_alimentos.Nombre as feed_type', DB::raw('SUM(CantidadKg) as total'))
-                ->where('alimentacion.Fecha', '>=', now()->subDays(30))
-                ->groupBy('tipo_alimentos.Nombre')
-                ->get(),
-            'costs' => (object)['total_cost' => 0] // No hay columna PrecioPorKg en tipo_alimentos
+            'consumption' => $consumption7d,
+            'by_feed_type' => $byFeedType30d,
+            'estimated_costs' => [
+                'total_cost_7d' => $estimatedCost7d,
+                'total_cost_30d' => $estimatedCost30d,
+                'price_per_kg' => $pricePerKg,
+            ],
         ];
     }
 
     private function getFinancialStats()
     {
         if (!Schema::hasTable('movimiento_lote')) {
-            return ['sales' => [], 'purchases' => [], 'revenue' => 0];
+            return [
+                'sales' => 0,
+                'purchases' => 0,
+                'revenue' => 0,
+                'estimated_expenses_30d' => $this->getTotalExpenses(30),
+                'estimated_net_30d' => 0 - $this->getTotalExpenses(30),
+            ];
         }
 
+        $salesCount30d = DB::table('movimiento_lote')
+            ->where('TipoMovimiento', 'Venta')
+            ->where('Fecha', '>=', now()->subDays(30))
+            ->count();
+
+        $purchasesCount30d = DB::table('movimiento_lote')
+            ->where('TipoMovimiento', 'Compra')
+            ->where('Fecha', '>=', now()->subDays(30))
+            ->count();
+
+        $revenue = $this->calculateRevenue();
+        $expenses = $this->getTotalExpenses(30);
+
         return [
-            'sales' => DB::table('movimiento_lote')
-                ->where('TipoMovimiento', 'Venta')
-                ->where('Fecha', '>=', now()->subDays(30))
-                ->count(), // Contar ventas ya que no hay ValorTotal
-            'purchases' => DB::table('movimiento_lote')
-                ->where('TipoMovimiento', 'Compra')
-                ->where('Fecha', '>=', now()->subDays(30))
-                ->count(), // Contar compras ya que no hay ValorTotal
-            'revenue' => $this->calculateRevenue()
+            'sales' => $salesCount30d,
+            'purchases' => $purchasesCount30d,
+            'revenue' => $revenue,
+            'estimated_expenses_30d' => $expenses,
+            'estimated_net_30d' => $revenue - $expenses,
         ];
     }
 
@@ -237,6 +293,62 @@ class AdminDashboardController extends Controller
         });
 
         return array_slice($activities, 0, 10);
+    }
+
+    private function getTotalExpenses(int $days = 30): float
+    {
+        // Estimar costos de alimentación
+        $feedCost = 0.0;
+        if (Schema::hasTable('alimentacion')) {
+            $pricePerKg = (float) config('gepro.feed_price_per_kg', 0);
+            $totalKg = (float) DB::table('alimentacion')
+                ->where('Fecha', '>=', now()->subDays($days))
+                ->sum('CantidadKg');
+            $feedCost = $totalKg * $pricePerKg;
+        }
+
+        // Estimar costos de sanidad por tipo de tratamiento
+        $healthCost = 0.0;
+        if (Schema::hasTable('sanidad')) {
+            $treatments = DB::table('sanidad')
+                ->select('TipoTratamiento as treatment', DB::raw('count(*) as total'))
+                ->where('Fecha', '>=', now()->subDays($days))
+                ->groupBy('TipoTratamiento')
+                ->get();
+            $healthCost = $this->estimateHealthCosts($treatments);
+        }
+
+        // Estimar costo de compras de aves (no hay valor unitario en la BD)
+        $purchaseCost = 0.0;
+        if (Schema::hasTable('movimiento_lote')) {
+            $unitPrice = (float) config('gepro.bird_purchase_price', 0);
+            $purchasesCount = (int) DB::table('movimiento_lote')
+                ->where('TipoMovimiento', 'Compra')
+                ->where('Fecha', '>=', now()->subDays($days))
+                ->sum('Cantidad');
+            $purchaseCost = $purchasesCount * $unitPrice;
+        }
+
+        return (float) ($feedCost + $healthCost + $purchaseCost);
+    }
+
+    private function estimateHealthCosts($treatmentsCollection): float
+    {
+        // Mapa de costos estimados por tipo de tratamiento (configurable)
+        $costMap = [
+            'Vacuna' => (float) config('gepro.health_costs.vaccine', 0),
+            'Desparasitante' => (float) config('gepro.health_costs.dewormer', 0),
+            'Vitamina' => (float) config('gepro.health_costs.vitamin', 0),
+        ];
+
+        $total = 0.0;
+        foreach ($treatmentsCollection as $row) {
+            $type = $row->treatment ?? '';
+            $count = (int) ($row->total ?? 0);
+            $unit = $costMap[$type] ?? (float) config('gepro.health_costs.default', 0);
+            $total += $count * $unit;
+        }
+        return (float) $total;
     }
 
     // Helper methods
@@ -338,15 +450,17 @@ class AdminDashboardController extends Controller
             $totalEggs = DB::table('produccion_huevos')
                 ->where('Fecha', '>=', now()->subDays(30))
                 ->sum('CantidadHuevos');
-            $eggRevenue = $totalEggs * 500; // Assuming 500 pesos per egg
+            $pricePerEgg = (float) config('gepro.egg_price_per_unit', 500);
+            $eggRevenue = $totalEggs * $pricePerEgg;
         }
 
         // Calculate bird sales revenue (count since no ValorTotal column)
         if (Schema::hasTable('movimiento_lote')) {
+            $pricePerBirdSale = (float) config('gepro.bird_sale_price', 50000);
             $birdRevenue = DB::table('movimiento_lote')
                 ->where('TipoMovimiento', 'Venta')
                 ->where('Fecha', '>=', now()->subDays(30))
-                ->count() * 50000; // Estimación: 50,000 pesos por ave vendida
+                ->count() * $pricePerBirdSale; // Estimación configurable
         }
 
         return $eggRevenue + $birdRevenue;
