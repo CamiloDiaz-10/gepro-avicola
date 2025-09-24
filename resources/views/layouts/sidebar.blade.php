@@ -127,8 +127,103 @@
                     Operaciones
                 </div>
             </li>
+            
+            <!-- Producción de Huevos: Reportes -->
+            <li>
+                <a href="{{ route('admin.produccion-huevos.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-egg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Producción de Huevos
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Producción de Huevos</span>
+                </a>
+            </li>
+
+            <!-- Producción de Huevos: Registrar -->
+            <li>
+                <a href="{{ route('admin.produccion-huevos.create') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Producción
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Producción</span>
+                </a>
+            </li>
             @endif
 
+            <!-- Opciones específicas para Propietarios -->
+            @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Propietario')
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Producción
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('owner.produccion-huevos.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-egg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Producción de Huevos
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Producción de Huevos</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('owner.produccion-huevos.create') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Producción
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Producción</span>
+                </a>
+            </li>
+            @endif
+
+            <!-- Opciones específicas para Empleados -->
+            @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Empleado')
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Producción
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('employee.produccion-huevos.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('employee.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-egg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Producción de Huevos
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Producción de Huevos</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('employee.produccion-huevos.create') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('employee.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Producción
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Producción</span>
+                </a>
+            </li>
+            @endif
             <li>
                 <a href="#" 
                    class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
@@ -157,34 +252,7 @@
                 </a>
             </li>
 
-            @can('Propietario')
-            <li>
-                <a href="#" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
-                   onclick="alert('Módulo de Producción en desarrollo')">
-                    <i class="fas fa-egg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
-                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
-                        Producción de Huevos
-                    </span>
-                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Producción de Huevos</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ route('admin.reports.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.reports.*') ? 'bg-blue-800' : '' }}"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-chart-line" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
-                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
-                        Informes y Reportes
-                    </span>
-                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Informes y Reportes</span>
-                </a>
-            </li>
-            @endcan
+            <!-- Sección de propietario removida para evitar placeholder de producción en desarrollo -->
 
             <li>
                 <a href="{{ route('profile.index') }}" 

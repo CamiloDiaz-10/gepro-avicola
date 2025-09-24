@@ -83,6 +83,12 @@ Route::middleware('auth')->group(function () {
         // Gestión de tratamientos (sanidad)
         Route::resource('sanidad', SanidadController::class);
         
+        // Producción de Huevos
+        Route::get('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'index'])->name('produccion-huevos.index');
+        Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
+        Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
+        Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
+        
         // Otras rutas administrativas (comentadas hasta crear los controladores)
         /*
         Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
@@ -93,24 +99,20 @@ Route::middleware('auth')->group(function () {
     });
     
     // Rutas específicas para propietarios (comentadas hasta crear los controladores)
-    /*
-    Route::middleware(['role:Propietario'])->group(function () {
-        Route::resource('fincas', FincaController::class);
-        Route::resource('birds', BirdController::class);
-        
-        // Rutas de reportes
-        Route::prefix('reports')->group(function () {
-            Route::get('/', [ReportController::class, 'index'])->name('reports.index');
-            Route::get('/production', [ReportController::class, 'generateProductionReport'])->name('reports.production');
-            Route::get('/inventory', [ReportController::class, 'generateInventoryReport'])->name('reports.inventory');
-            Route::get('/health', [ReportController::class, 'generateHealthReport'])->name('reports.health');
-        });
+    Route::middleware(['role:Propietario'])->prefix('owner')->name('owner.')->group(function () {
+        // Producción de Huevos (Propietario)
+        Route::get('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'index'])->name('produccion-huevos.index');
+        Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
+        Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
+        Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
     });
     
-    // Rutas específicas para empleados (comentadas hasta crear los controladores)
-    Route::middleware(['role:Empleado'])->group(function () {
-        Route::resource('egg-production', EggProductionController::class);
-        Route::resource('health-records', HealthRecordController::class);
+    // Rutas específicas para empleados 
+    Route::middleware(['role:Empleado'])->prefix('employee')->name('employee.')->group(function () {
+        // Producción de Huevos (Empleado)
+        Route::get('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'index'])->name('produccion-huevos.index');
+        Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
+        Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
+        Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
     });
-    */
 });
