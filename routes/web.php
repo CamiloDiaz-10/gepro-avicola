@@ -6,11 +6,13 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\FincaController;
+use App\Http\Controllers\Admin\LoteController;
+use App\Http\Controllers\Admin\ReportController;
 // Controladores comentados hasta crearlos:
 // use App\Http\Controllers\UserController;
 // use App\Http\Controllers\RoleController;
 // use App\Http\Controllers\SystemController;
-// use App\Http\Controllers\FincaController;
 // use App\Http\Controllers\BirdController;
 // use App\Http\Controllers\EggProductionController;
 // use App\Http\Controllers\HealthRecordController;
@@ -66,11 +68,21 @@ Route::middleware('auth')->group(function () {
         Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         Route::patch('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
         
+        // Gestión de fincas
+        Route::resource('fincas', FincaController::class);
+        // Gestión de lotes
+        Route::resource('lotes', LoteController::class);
+        // Reportes avanzados
+        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/export/production', [ReportController::class, 'exportProduction'])->name('reports.export.production');
+        Route::get('reports/export/feeding', [ReportController::class, 'exportFeeding'])->name('reports.export.feeding');
+        Route::get('reports/export/health', [ReportController::class, 'exportHealth'])->name('reports.export.health');
+        Route::get('reports/export/finance', [ReportController::class, 'exportFinance'])->name('reports.export.finance');
+        
         // Otras rutas administrativas (comentadas hasta crear los controladores)
         /*
         Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
         Route::get('/system/logs', [SystemController::class, 'logs'])->name('system.logs');
-        Route::resource('fincas', FincaController::class);
         Route::resource('lotes', LoteController::class);
         Route::resource('gallinas', GallinaController::class);
         */

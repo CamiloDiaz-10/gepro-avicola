@@ -83,10 +83,9 @@
             </li>
 
             <li>
-                <a href="#" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
-                   onclick="alert('Próximamente: Gestión de Fincas')">
+                <a href="{{ route('admin.fincas.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.fincas.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
                     <i class="fas fa-warehouse" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
                     <span class="transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
@@ -97,10 +96,9 @@
             </li>
 
             <li>
-                <a href="#" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
-                   onclick="alert('Próximamente: Gestión de Lotes')">
+                <a href="{{ route('admin.lotes.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.lotes.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
                     <i class="fas fa-layer-group" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
                     <span class="transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
@@ -111,10 +109,9 @@
             </li>
 
             <li>
-                <a href="#" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
-                   onclick="alert('Próximamente: Sistema de Reportes')">
+                <a href="{{ route('admin.reports.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.reports.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
                     <i class="fas fa-chart-bar" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
                     <span class="transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
@@ -176,10 +173,9 @@
             </li>
 
             <li>
-                <a href="#" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
-                   onclick="alert('Módulo de Reportes en desarrollo')">
+                <a href="{{ route('admin.reports.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.reports.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
                     <i class="fas fa-chart-line" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
                     <span class="transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">

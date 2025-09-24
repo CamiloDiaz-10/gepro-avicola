@@ -14,11 +14,10 @@ class Lote extends Model
     
     protected $fillable = [
         'IDFinca',
-        'NombreLote',
+        'Nombre',
         'FechaIngreso',
         'CantidadInicial',
-        'Raza',
-        'Estado'
+        'Raza'
     ];
 
     protected $casts = [
@@ -62,12 +61,6 @@ class Lote extends Model
         return $this->hasMany(Mortalidad::class, 'IDLote', 'IDLote');
     }
 
-    // Scopes
-    public function scopeActivos($query)
-    {
-        return $query->where('Estado', 'Activo');
-    }
-
     public function scopePorFinca($query, $fincaId)
     {
         return $query->where('IDFinca', $fincaId);
@@ -77,26 +70,5 @@ class Lote extends Model
     public function getEdadEnDiasAttribute()
     {
         return $this->FechaIngreso ? now()->diffInDays($this->FechaIngreso) : 0;
-    }
-
-    public function getCantidadActualAttribute()
-    {
-        $muertas = $this->mortalidad()->sum('CantidadMuertas');
-        $vendidas = $this->movimientos()->where('TipoMovimiento', 'Venta')->sum('CantidadAves');
-        return $this->CantidadInicial - $muertas - $vendidas;
-    }
-
-    // Static methods
-    public static function getLotesActivos()
-    {
-        return static::where('Estado', 'Activo')->count();
-    }
-
-    public static function getLotesPorFinca()
-    {
-        return static::with('finca')
-            ->selectRaw('IDFinca, COUNT(*) as total_lotes')
-            ->groupBy('IDFinca')
-            ->get();
     }
 }

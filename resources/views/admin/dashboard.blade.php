@@ -16,9 +16,9 @@
                     <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                         <i class="fas fa-download mr-2"></i>Exportar Reportes
                     </button>
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-plus mr-2"></i>Nuevo Registro
-                    </button>
+                    <a href="{{ route('admin.fincas.create') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Nueva Finca
+                    </a>
                 </div>
             </div>
         </div>
@@ -72,9 +72,9 @@
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900">Gestión de Usuarios</h3>
-                    <button class="text-blue-600 hover:text-blue-800" onclick="showUserManagement()">
+                    <a class="text-blue-600 hover:text-blue-800" href="{{ route('admin.users.index') }}" title="Ir a Gestión de Usuarios">
                         <i class="fas fa-cog"></i>
-                    </button>
+                    </a>
                 </div>
                 
                 <div class="space-y-3">
@@ -104,9 +104,9 @@
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900">Gestión de Fincas</h3>
-                    <button class="text-green-600 hover:text-green-800" onclick="showFarmManagement()">
+                    <a class="text-green-600 hover:text-green-800" href="{{ route('admin.fincas.index') }}" title="Ir a Gestión de Fincas">
                         <i class="fas fa-cog"></i>
-                    </button>
+                    </a>
                 </div>
 
                 <div class="space-y-3">
@@ -126,9 +126,9 @@
                 </div>
 
                 <div class="mt-4">
-                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition-colors">
+                    <a href="{{ route('admin.fincas.create') }}" class="block w-full text-center bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition-colors">
                         <i class="fas fa-plus mr-2"></i>Nueva Finca
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -136,9 +136,9 @@
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900">Gestión de Aves</h3>
-                    <button class="text-purple-600 hover:text-purple-800" onclick="showBirdManagement()">
+                    <a class="text-purple-600 hover:text-purple-800" href="{{ route('admin.lotes.index') }}" title="Ir a Gestión de Aves">
                         <i class="fas fa-cog"></i>
-                    </button>
+                    </a>
                 </div>
 
                 <div class="space-y-3">
@@ -151,9 +151,9 @@
                 </div>
 
                 <div class="mt-4">
-                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded transition-colors">
+                    <a href="{{ route('admin.lotes.create') }}" class="block w-full text-center bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded transition-colors">
                         <i class="fas fa-feather mr-2"></i>Nuevo Lote
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -327,15 +327,15 @@
                 <p class="font-semibold">Gestionar Usuarios</p>
             </a>
             
-            <button class="bg-white hover:bg-gray-50 border-2 border-green-200 text-green-700 p-4 rounded-lg transition-colors text-center" onclick="alert('Próximamente: Gestión de Fincas')">
+            <a href="{{ route('admin.fincas.index') }}" class="bg-white hover:bg-gray-50 border-2 border-green-200 text-green-700 p-4 rounded-lg transition-colors text-center block">
                 <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
                 <p class="font-semibold">Gestionar Fincas</p>
-            </button>
+            </a>
             
-            <button class="bg-white hover:bg-gray-50 border-2 border-purple-200 text-purple-700 p-4 rounded-lg transition-colors text-center" onclick="alert('Próximamente: Gestión de Lotes')">
+            <a href="{{ route('admin.lotes.index') }}" class="bg-white hover:bg-gray-50 border-2 border-purple-200 text-purple-700 p-4 rounded-lg transition-colors text-center block">
                 <i class="fas fa-feather fa-2x mb-2"></i>
                 <p class="font-semibold">Gestionar Lotes</p>
-            </button>
+            </a>
             
             <button class="bg-white hover:bg-gray-50 border-2 border-red-200 text-red-700 p-4 rounded-lg transition-colors text-center" onclick="alert('Próximamente: Sistema de Reportes')">
                 <i class="fas fa-chart-bar fa-2x mb-2"></i>

@@ -80,7 +80,8 @@ class User extends Authenticatable
     public function fincas()
     {
         return $this->belongsToMany(Finca::class, 'usuario_finca', 'IDUsuario', 'IDFinca')
-                    ->withPivot('rol_en_finca');
+                    ->withPivot('RolEnFinca')
+                    ->withTimestamps();
     }
 
     public function hasRole($roleName)

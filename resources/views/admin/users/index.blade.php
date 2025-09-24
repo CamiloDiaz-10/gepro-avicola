@@ -113,7 +113,7 @@
                                 <div class="text-sm text-gray-900">{{ $user->fincas->count() }} finca(s)</div>
                                 @if($user->fincas->count() > 0)
                                 <div class="text-xs text-gray-500">
-                                    {{ $user->fincas->pluck('NombreFinca')->take(2)->implode(', ') }}
+                                    {{ $user->fincas->pluck('Nombre')->take(2)->implode(', ') }}
                                     @if($user->fincas->count() > 2)
                                         y {{ $user->fincas->count() - 2 }} más
                                     @endif

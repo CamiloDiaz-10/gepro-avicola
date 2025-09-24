@@ -122,11 +122,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @foreach($user->fincas as $finca)
                         <div class="border border-gray-200 rounded-lg p-4">
-                            <h4 class="font-medium text-gray-900">{{ $finca->NombreFinca }}</h4>
+                            <h4 class="font-medium text-gray-900">{{ $finca->Nombre }}</h4>
                             <p class="text-sm text-gray-600">{{ $finca->Ubicacion }}</p>
-                            @if($finca->Descripcion)
-                            <p class="text-xs text-gray-500 mt-1">{{ $finca->Descripcion }}</p>
-                            @endif
+                            <div class="text-xs text-gray-500 mt-1 space-y-0.5">
+                                @if(!is_null($finca->Hectareas))
+                                    <p>Hectáreas: {{ number_format($finca->Hectareas, 2) }}</p>
+                                @endif
+                                @if(!is_null($finca->Latitud) && !is_null($finca->Longitud))
+                                    <p>Coordenadas: {{ $finca->Latitud }}, {{ $finca->Longitud }}</p>
+                                @endif
+                            </div>
                         </div>
                         @endforeach
                     </div>
