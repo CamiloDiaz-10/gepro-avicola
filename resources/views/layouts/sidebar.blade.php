@@ -108,6 +108,32 @@
                 </a>
             </li>
 
+            <!-- Gestión de Aves (Admin) -->
+            <li>
+                <a href="{{ route('admin.aves.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.aves.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-dove" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Gestionar Aves
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestionar Aves</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.aves.create') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.aves.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Ave
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Ave</span>
+                </a>
+            </li>
+
             <li>
                 <a href="{{ route('admin.reports.index') }}" 
                    class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.reports.*') ? 'bg-blue-800' : '' }}"
@@ -224,62 +250,7 @@
                 </a>
             </li>
             @endif
-            <li>
-                <a href="#" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
-                   onclick="alert('Módulo de Fincas en desarrollo')">
-                    <i class="fas fa-warehouse" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
-                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
-                        Fincas
-                    </span>
-                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Fincas</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="#" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''"
-                   onclick="alert('Módulo de Aves en desarrollo')">
-                    <i class="fas fa-feather" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
-                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
-                        Aves
-                    </span>
-                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Aves</span>
-                </a>
-            </li>
-
-            <!-- Sección de propietario removida para evitar placeholder de producción en desarrollo -->
-
-            <li>
-                <a href="{{ route('profile.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('profile.*') ? 'bg-blue-800' : '' }}"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-user-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
-                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
-                        Mi Perfil
-                    </span>
-                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Mi Perfil</span>
-                </a>
-            </li>
-            
-            <!-- Ejemplo de sincronización -->
-            <li>
-                <a href="{{ route('example.sidebar') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('example.sidebar') ? 'bg-blue-800' : '' }}"
-                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-cogs" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
-                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
-                        Demo Sincronización
-                    </span>
-                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Demo Sincronización</span>
-                </a>
-            </li>
+          
         </ul>
     </nav>
 </aside>

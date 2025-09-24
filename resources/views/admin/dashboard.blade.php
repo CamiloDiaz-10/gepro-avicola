@@ -363,10 +363,10 @@
                 <p class="font-semibold">Gestionar Lotes</p>
             </a>
             
-            <button class="bg-white hover:bg-gray-50 border-2 border-red-200 text-red-700 p-4 rounded-lg transition-colors text-center" onclick="alert('Próximamente: Sistema de Reportes')">
+            <a href="{{ route('admin.reports.index') }}" class="bg-white hover:bg-gray-50 border-2 border-red-200 text-red-700 p-4 rounded-lg transition-colors text-center block">
                 <i class="fas fa-chart-bar fa-2x mb-2"></i>
                 <p class="font-semibold">Ver Reportes</p>
-            </button>
+            </a>
         </div>
     </div>
 </div>

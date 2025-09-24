@@ -88,6 +88,12 @@ Route::middleware('auth')->group(function () {
         Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
         Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
         Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
+
+        // Gestión de Aves
+        Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
+        Route::get('aves/create', [\App\Http\Controllers\Admin\BirdsController::class, 'create'])->name('aves.create');
+        Route::post('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'store'])->name('aves.store');
+        Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
         
         // Otras rutas administrativas (comentadas hasta crear los controladores)
         /*
