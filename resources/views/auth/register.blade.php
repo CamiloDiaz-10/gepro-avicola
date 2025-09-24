@@ -137,7 +137,9 @@
                         <option value="">Seleccione un rol</option>
                         @if(isset($roles) && count($roles) > 0)
                             @foreach($roles as $rol)
-                                <option value="{{ $rol->IDRol }}">{{ $rol->NombreRol }}</option>
+                                @if(strtolower($rol->NombreRol) !== 'administrador')
+                                    <option value="{{ $rol->IDRol }}">{{ $rol->NombreRol }}</option>
+                                @endif
                             @endforeach
                         @else
                             <option value="" disabled>No hay roles disponibles</option>
