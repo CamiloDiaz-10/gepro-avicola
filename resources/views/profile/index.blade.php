@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app-with-sidebar')
 
 @section('title', 'Mi Perfil')
 
