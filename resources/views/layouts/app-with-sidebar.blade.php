@@ -55,7 +55,7 @@
         @endauth
         
         <!-- Main Content Area -->
-        <div class="transition-all duration-300 ease-in-out"
+        <div class="transition-all duration-300 ease-in-out min-h-screen flex flex-col"
              :class="{
                  'md:ml-64': !sidebarCollapsed && window.innerWidth >= 768,
                  'md:ml-16': sidebarCollapsed && window.innerWidth >= 768,
@@ -63,7 +63,7 @@
              }">
             
             <!-- Content -->
-            <main class="@auth pt-16 @endauth min-h-screen">
+            <main class="@auth pt-16 @endauth flex-1 overflow-y-auto thin-scroll">
                 @yield('content')
             </main>
             

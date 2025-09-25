@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<aside class="bg-blue-900 text-white min-h-screen fixed left-0 top-0 transform transition-all duration-300 ease-in-out z-30"
+<aside class="bg-blue-900 text-white min-h-screen fixed left-0 top-0 transform transition-all duration-300 ease-in-out z-30 flex flex-col overflow-y-hidden"
        :class="{
            'translate-x-0': sidebarOpen || window.innerWidth >= 768,
            '-translate-x-full': !sidebarOpen && window.innerWidth < 768,
@@ -20,8 +20,8 @@
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="p-4">
+    <!-- Navigation (scrollable area) -->
+    <nav class="p-4 flex-1 overflow-y-auto thin-scroll pr-2">
         <ul class="space-y-2">
             <li>
                 @php
@@ -134,6 +134,32 @@
                 </a>
             </li>
 
+            <!-- Gestión de Alimentación (Admin) -->
+            <li>
+                <a href="{{ route('admin.alimentacion.index') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.alimentacion.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-utensils" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Gestión de Alimentación
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestión de Alimentación</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.alimentacion.create') }}" 
+                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.alimentacion.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
+                    <span class="transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Alimentación
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Alimentación</span>
+                </a>
+            </li>
+
             <li>
                 <a href="{{ route('admin.reports.index') }}" 
                    class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.reports.*') ? 'bg-blue-800' : '' }}"
@@ -148,11 +174,7 @@
             </li>
 
             <li>
-                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
-                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
-                    Operaciones
-                </div>
-            </li>
+                
             
             <!-- Producción de Huevos: Reportes -->
             <li>
@@ -306,5 +328,23 @@
         border-width: 5px;
         border-style: solid;
         border-color: transparent #374151 transparent transparent;
+    }
+
+    /* Thin scrollbar for sidebar scroll area */
+    .thin-scroll {
+        scrollbar-width: thin; /* Firefox */
+        scrollbar-color: #1f2937 transparent; /* Firefox */
+    }
+    .thin-scroll::-webkit-scrollbar {
+        width: 8px; /* Chrome/Edge */
+    }
+    .thin-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .thin-scroll::-webkit-scrollbar-thumb {
+        background-color: #1f2937; /* gray-800 */
+        border-radius: 8px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
     }
 </style>

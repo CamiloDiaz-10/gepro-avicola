@@ -15,18 +15,16 @@ class Alimentacion extends Model
     
     protected $fillable = [
         'IDLote',
+        'IDUsuario',
         'IDTipoAlimento',
         'Fecha',
-        'CantidadAlimento',
-        'UnidadMedida',
-        'CostoTotal',
+        'CantidadKg',
         'Observaciones'
     ];
 
     protected $casts = [
         'Fecha' => 'date',
-        'CantidadAlimento' => 'decimal:2',
-        'CostoTotal' => 'decimal:2'
+        'CantidadKg' => 'decimal:2'
     ];
 
     // Relationships
@@ -70,31 +68,33 @@ class Alimentacion extends Model
     public static function getConsumptionToday()
     {
         return static::whereDate('Fecha', now()->toDateString())
-            ->sum('CantidadAlimento') ?? 0;
+            ->sum('CantidadKg') ?? 0;
     }
 
     public static function getConsumptionThisWeek()
     {
         return static::whereBetween('Fecha', [now()->startOfWeek(), now()])
-            ->sum('CantidadAlimento') ?? 0;
+            ->sum('CantidadKg') ?? 0;
     }
 
     public static function getConsumptionThisMonth()
     {
         return static::whereBetween('Fecha', [now()->startOfMonth(), now()])
-            ->sum('CantidadAlimento') ?? 0;
+            ->sum('CantidadKg') ?? 0;
     }
 
     public static function getCostThisMonth()
     {
         return static::whereBetween('Fecha', [now()->startOfMonth(), now()])
-            ->sum('CostoTotal') ?? 0;
+            ->leftJoin('tipo_alimentos','tipo_alimentos.IDTipoAlimento','=','alimentacion.IDTipoAlimento')
+            ->select(DB::raw('SUM(CantidadKg * COALESCE(PrecioPorKg,0)) as total_cost'))
+            ->value('total_cost') ?? 0;
     }
 
     public static function getConsumptionByType($days = 30)
     {
         return static::with('tipoAlimento')
-            ->select('IDTipoAlimento', DB::raw('SUM(CantidadAlimento) as total_consumption'))
+            ->select('IDTipoAlimento', DB::raw('SUM(CantidadKg) as total_consumption'))
             ->whereBetween('Fecha', [now()->subDays($days), now()])
             ->groupBy('IDTipoAlimento')
             ->orderByDesc('total_consumption')
@@ -103,7 +103,7 @@ class Alimentacion extends Model
 
     public static function getDailyConsumption($days = 7)
     {
-        return static::select('Fecha as date', DB::raw('SUM(CantidadAlimento) as total'))
+        return static::select('Fecha as date', DB::raw('SUM(CantidadKg) as total'))
             ->whereBetween('Fecha', [now()->subDays($days - 1), now()])
             ->groupBy('Fecha')
             ->orderBy('Fecha')
@@ -113,7 +113,7 @@ class Alimentacion extends Model
     public static function getConsumptionByLot($days = 30)
     {
         return static::with('lote')
-            ->select('IDLote', DB::raw('SUM(CantidadAlimento) as total_consumption'))
+            ->select('IDLote', DB::raw('SUM(CantidadKg) as total_consumption'))
             ->whereBetween('Fecha', [now()->subDays($days), now()])
             ->groupBy('IDLote')
             ->orderByDesc('total_consumption')
@@ -129,7 +129,7 @@ class Alimentacion extends Model
         }
 
         $totalConsumption = $query->whereBetween('Fecha', [now()->subDays(30), now()])
-            ->sum('CantidadAlimento');
+            ->sum('CantidadKg');
 
         // Assuming we need to calculate based on bird count in lots
         $totalBirds = Gallina::when($loteId, function($q) use ($loteId) {
@@ -140,8 +140,10 @@ class Alimentacion extends Model
     }
 
     // Accessors & Mutators
-    public function getCostoPorKgAttribute()
+    // Costo estimado de este registro basado en precio del tipo de alimento
+    public function getCostoEstimadoAttribute()
     {
-        return $this->CantidadAlimento > 0 ? $this->CostoTotal / $this->CantidadAlimento : 0;
+        $precio = optional($this->tipoAlimento)->PrecioPorKg ?? 0;
+        return ($this->CantidadKg ?? 0) * $precio;
     }
 }
