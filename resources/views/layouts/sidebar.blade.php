@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<aside class="bg-blue-900 text-white min-h-screen fixed left-0 top-0 transform transition-all duration-300 ease-in-out z-30 flex flex-col overflow-y-hidden"
+<aside class="bg-blue-900 text-white h-screen fixed left-0 top-0 transform transition-all duration-300 ease-in-out z-30 flex flex-col overflow-y-hidden"
        :class="{
            'translate-x-0': sidebarOpen || window.innerWidth >= 768,
            '-translate-x-full': !sidebarOpen && window.innerWidth < 768,
