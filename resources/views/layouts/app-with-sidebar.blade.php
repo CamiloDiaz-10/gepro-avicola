@@ -6,6 +6,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Gepro Avícola')</title>
     
+    <!-- PWA: Manifest & Meta -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="application-name" content="Gepro Avícola">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Gepro Avícola">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
@@ -132,6 +141,16 @@
             if (successToast) successToast.remove();
             if (errorToast) errorToast.remove();
         }, 5000);
+    </script>
+
+    <!-- PWA: Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .catch(err => console.warn('SW registration failed', err));
+            });
+        }
     </script>
 </body>
 </html>
