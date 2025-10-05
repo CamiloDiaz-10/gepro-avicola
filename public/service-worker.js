@@ -1,5 +1,5 @@
 /* Gepro Avícola Service Worker */
-const CACHE_NAME = 'gepro-avicola-v1';
+const CACHE_NAME = 'gepro-avicola-v2';
 const OFFLINE_URL = '/offline';
 
 // Add core routes/assets to pre-cache (customize as needed)
@@ -28,18 +28,38 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+  const url = new URL(request.url);
 
-  // Only handle GET requests
-  if (request.method !== 'GET') return;
+  // NEVER cache authentication, API, or POST requests
+  const skipCache = [
+    '/login',
+    '/register',
+    '/logout',
+    '/api/',
+    '/admin/',
+    '/owner/',
+    '/employee/',
+    '/_ignition',
+  ];
+
+  const shouldSkipCache = skipCache.some(path => url.pathname.includes(path)) || 
+                          request.method !== 'GET';
+
+  if (shouldSkipCache) {
+    // Pass through to network without caching
+    return;
+  }
 
   // Navigation requests: serve offline page when network fails
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          // Optionally update cache with latest page
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          // Only cache successful responses
+          if (response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
           return response;
         })
         .catch(async () => {
@@ -55,13 +75,15 @@ self.addEventListener('fetch', (event) => {
   }
 
   // For same-origin GET requests: try cache first, then network
-  if (new URL(request.url).origin === self.location.origin) {
+  if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(request).then((cached) => {
         const networkFetch = fetch(request)
           .then((response) => {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            if (response.status === 200) {
+              const copy = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            }
             return response;
           })
           .catch(() => cached || caches.match(OFFLINE_URL));

@@ -29,12 +29,41 @@ Route::get('/welcome', [HomeController::class, 'index'])->name('welcome');
 Route::view('/offline', 'offline')->name('offline');
 
 // Rutas de autenticación
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-    
-    Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register')->middleware('guest');
+Route::post('/register', [AuthController::class, 'register']);
+
+// Ruta de prueba para verificar autenticación
+Route::get('/test-auth', function() {
+    if (auth()->check()) {
+        return response()->json([
+            'authenticated' => true,
+            'user' => auth()->user()->Email,
+            'role' => auth()->user()->role->NombreRol ?? 'Sin rol'
+        ]);
+    }
+    return response()->json(['authenticated' => false]);
+})->name('test.auth');
+
+// Ruta de login manual para testing
+Route::get('/test-login', function() {
+    $user = \App\Models\User::with('role')->where('Email', 'admin@geproavicola.com')->first();
+    if ($user) {
+        auth()->login($user, false);
+        $rol = $user->role ? $user->role->NombreRol : null;
+        
+        $redirectRoute = match ($rol) {
+            'Administrador' => 'admin.dashboard',
+            'Propietario' => 'owner.dashboard',
+            'Empleado' => 'employee.dashboard',
+            default => 'dashboard'
+        };
+        
+        return redirect()->route($redirectRoute);
+    }
+    return 'Usuario no encontrado';
 });
 
 // Rutas protegidas

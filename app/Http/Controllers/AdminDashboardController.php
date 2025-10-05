@@ -15,9 +15,19 @@ class AdminDashboardController extends Controller
 
     public function index()
     {
-        $statistics = $this->getAdminStatistics();
-        
-        return view('admin.dashboard', compact('statistics'));
+        try {
+            $statistics = $this->getAdminStatistics();
+            
+            return view('admin.dashboard', compact('statistics'));
+        } catch (\Exception $e) {
+            \Log::error('Error en AdminDashboard: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user' => auth()->user()->Email ?? 'unknown'
+            ]);
+            
+            // Vista simplificada en caso de error
+            return view('admin.dashboard-simple');
+        }
     }
 
     private function getAdminStatistics()

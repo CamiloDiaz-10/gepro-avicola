@@ -22,17 +22,54 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'Email' => 'required|email',
-            'Contrasena' => 'required'
+        \Log::info('=== INICIO LOGIN REQUEST ===', [
+            'method' => $request->method(),
+            'url' => $request->url(),
+            'has_email' => $request->has('Email'),
+            'has_password' => $request->has('Contrasena'),
+            'all_input' => $request->except('Contrasena')
         ]);
 
-        // Buscar usuario manualmente y verificar contraseña, incluyendo la relación role
-        $user = User::with('role')->where('Email', $credentials['Email'])->first();
-        
-        if ($user && Hash::check($credentials['Contrasena'], $user->Contrasena)) {
-            auth()->login($user);
+        try {
+            $credentials = $request->validate([
+                'Email' => 'required|email',
+                'Contrasena' => 'required'
+            ]);
+            
+            \Log::info('Validación exitosa', ['email' => $credentials['Email']]);
+
+            // Buscar usuario manualmente y verificar contraseña, incluyendo la relación role
+            $user = User::with('role')->where('Email', $credentials['Email'])->first();
+            
+            if (!$user) {
+                \Log::warning('Usuario no encontrado', ['email' => $credentials['Email']]);
+                return back()->withErrors([
+                    'Email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+                ])->withInput($request->except('Contrasena'));
+            }
+            
+            \Log::info('Usuario encontrado, verificando contraseña');
+            
+            if (!Hash::check($credentials['Contrasena'], $user->Contrasena)) {
+                \Log::warning('Contraseña incorrecta');
+                return back()->withErrors([
+                    'Email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+                ])->withInput($request->except('Contrasena'));
+            }
+            
+            \Log::info('Contraseña correcta, iniciando sesión');
+            
+            // Login sin "remember me" para que la sesión expire al cerrar el navegador
+            auth()->login($user, false);
+            
+            \Log::info('Usuario logueado, auth()->check(): ' . (auth()->check() ? 'true' : 'false'));
+            \Log::info('Session ID antes de regenerar: ' . $request->session()->getId());
+            
             $request->session()->regenerate();
+            
+            \Log::info('Session ID después de regenerar: ' . $request->session()->getId());
+            \Log::info('Sesión iniciada, auth()->check(): ' . (auth()->check() ? 'true' : 'false'));
+            \Log::info('Session data: ' . json_encode($request->session()->all()));
             
             // Obtener el rol del usuario (ya cargado con la relación)
             $user = auth()->user();
@@ -42,22 +79,41 @@ class AuthController extends Controller
             }
             $rol = $user->role ? $user->role->NombreRol : null;
 
-            // Redireccionar según el rol
-            switch ($rol) {
-                case 'Administrador':
-                    return redirect()->route('admin.dashboard');
-                case 'Propietario':
-                    return redirect()->route('owner.dashboard');
-                case 'Empleado':
-                    return redirect()->route('employee.dashboard');
-                default:
-                    return redirect()->route('dashboard');
-            }
-        }
+            \Log::info('Login exitoso', [
+                'user' => $user->Email,
+                'role' => $rol,
+                'user_id' => $user->IDUsuario
+            ]);
 
-        return back()->withErrors([
-            'Email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
-        ])->withInput($request->except('Contrasena'));
+            // Determinar la ruta según el rol
+            $redirectRoute = match ($rol) {
+                'Administrador' => '/admin/dashboard',
+                'Propietario' => '/owner/dashboard',
+                'Empleado' => '/employee/dashboard',
+                default => '/dashboard'
+            };
+
+            \Log::info('Redirigiendo a: ' . $redirectRoute);
+            
+            // Guardar explícitamente la sesión antes de redirigir
+            $request->session()->save();
+            
+            \Log::info('Sesión guardada, verificando en DB...');
+            $sessionCount = \DB::table('sessions')->where('user_id', $user->IDUsuario)->count();
+            \Log::info('Sesiones en DB para usuario: ' . $sessionCount);
+            
+            // Redirección directa
+            return redirect($redirectRoute)->with('login_success', true);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error en login: ' . $e->getMessage(), [
+                'exception' => $e->getTraceAsString()
+            ]);
+            
+            return back()->withErrors([
+                'Email' => 'Error al procesar el login: ' . $e->getMessage(),
+            ])->withInput($request->except('Contrasena'));
+        }
     }
 
     public function register(Request $request)
@@ -112,7 +168,8 @@ class AuthController extends Controller
 
             // Cargar la relación role antes de hacer login
             $user->load('role');
-            auth()->login($user);
+            // Login sin "remember me" para que la sesión expire al cerrar el navegador
+            auth()->login($user, false);
             
             return redirect('/dashboard');
         } catch (\Exception $e) {

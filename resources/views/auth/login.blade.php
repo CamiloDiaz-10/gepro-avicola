@@ -32,7 +32,7 @@
             </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}" class="space-y-5">
+            <form method="POST" action="{{ route('login') }}" class="space-y-5" id="loginForm">
                 @csrf
 
                 <div>
@@ -51,15 +51,32 @@
                 </div>
 
                 <div>
-                    <button type="submit" 
+                    <button type="submit" id="submitBtn"
                             class="w-full flex items-center justify-center py-2.5 sm:py-3 px-4 border border-transparent rounded-lg shadow-md text-sm sm:text-base font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 mr-2" id="loginIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                         </svg>
-                        Iniciar Sesión
+                        <span id="btnText">Iniciar Sesión</span>
                     </button>
                 </div>
             </form>
+
+            <script>
+                document.getElementById('loginForm').addEventListener('submit', function(e) {
+                    const btn = document.getElementById('submitBtn');
+                    const btnText = document.getElementById('btnText');
+                    const icon = document.getElementById('loginIcon');
+                    
+                    btn.disabled = true;
+                    btn.classList.add('opacity-75', 'cursor-not-allowed');
+                    btnText.textContent = 'Iniciando sesión...';
+                    icon.classList.add('animate-spin');
+                    
+                    console.log('Formulario enviado');
+                    console.log('Email:', document.getElementById('Email').value);
+                    console.log('Action:', this.action);
+                });
+            </script>
 
             <div class="mt-6 text-center">
                 <p class="text-sm text-gray-600">

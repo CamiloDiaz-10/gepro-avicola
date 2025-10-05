@@ -62,12 +62,12 @@ class User extends Authenticatable
 
     public function getAuthIdentifierName()
     {
-        return 'Email';
+        return 'IDUsuario';
     }
 
     public function getAuthIdentifier()
     {
-        return $this->Email;
+        return $this->IDUsuario;
     }
 
     // Método eliminado para evitar doble encriptación
