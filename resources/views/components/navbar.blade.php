@@ -35,18 +35,18 @@
                 @endif
                 
                 <div class="flex-shrink-0 flex items-center">
-                    <img src="{{ asset('images/home2.png') }}" alt="Logo" class="w-12 h-12">
+                    <img src="{{ asset('images/home2.png') }}" alt="Logo" class="w-10 h-10 sm:w-12 sm:h-12">
                     <div class="ml-2">
-                        <h1 class="text-xl font-bold text-gray-900">{{   $title }}</h1>
+                        <h1 class="text-base sm:text-lg md:text-xl font-bold text-gray-900">{{   $title }}</h1>
                     </div>
                 </div>
             </div>
 
             <!-- Información del usuario y logout -->
             @if($showUserInfo && auth()->check())
-            <div class="flex items-center space-x-4">
-                <!-- Información del usuario -->
-                <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <!-- Información del usuario (oculta en móvil) -->
+                <div class="hidden sm:flex items-center space-x-3">
                     <div class="text-right">
                         <div class="text-sm font-medium text-gray-900">
                             {{ auth()->user()->Nombre }} {{ auth()->user()->Apellido }}
@@ -63,6 +63,13 @@
                         </svg>
                     </div>
                 </div>
+                
+                <!-- Avatar solo para móvil -->
+                <div class="sm:hidden w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
 
                 <!-- Dropdown menu -->
                 <div class="relative" x-data="{ open: false }">
@@ -72,8 +79,18 @@
                         </svg>
                     </button>
 
-                    <div x-show="open" @click.away="open = false" x-transition class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                    <div x-show="open" @click.away="open = false" x-transition class="origin-top-right absolute right-0 mt-2 w-56 sm:w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                         <div class="py-1">
+                            <!-- Información del usuario solo en móvil -->
+                            <div class="sm:hidden px-4 py-3 border-b border-gray-200">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ auth()->user()->Nombre }} {{ auth()->user()->Apellido }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    {{ auth()->user()->getRoleName() ?? 'Sin rol asignado' }}
+                                </div>
+                            </div>
+                            
                             <a href="{{ route('profile.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -91,7 +108,7 @@
                             <div class="px-4 py-2">
                                 <x-logout-button 
                                     size="small" 
-                                    class="w-full justify-center bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out"
+                                    class="w-full justify-center bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out text-sm"
                                     confirmMessage="¿Estás seguro de que deseas cerrar sesión?"
                                 >
                                     Cerrar Sesión

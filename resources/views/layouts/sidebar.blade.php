@@ -7,8 +7,8 @@
            'w-16': sidebarCollapsed && window.innerWidth >= 768
        }">
     <!-- Logo -->
-    <div class="p-6 border-b border-blue-800">
-        <h1 class="text-2xl font-bold transition-opacity duration-300" 
+    <div class="p-4 sm:p-6 border-b border-blue-800">
+        <h1 class="text-xl sm:text-2xl font-bold transition-opacity duration-300" 
             :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0' : 'opacity-100'">
             Gepro Avícola
         </h1>
@@ -16,13 +16,13 @@
         <div class="text-center" 
              x-show="sidebarCollapsed && window.innerWidth >= 768" 
              x-transition>
-            <i class="fas fa-feather text-2xl"></i>
+            <i class="fas fa-feather text-xl sm:text-2xl"></i>
         </div>
     </div>
 
     <!-- Navigation (scrollable area) -->
-    <nav class="p-4 flex-1 overflow-y-auto thin-scroll pr-2">
-        <ul class="space-y-2">
+    <nav class="p-3 sm:p-4 flex-1 overflow-y-auto thin-scroll pr-2">
+        <ul class="space-y-1 sm:space-y-2">
             <li>
                 @php
                     $dashboardRoute = 'dashboard';
@@ -49,10 +49,10 @@
                 @endphp
                 
                 <a href="{{ route($dashboardRoute) }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ $isActive ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ $isActive ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-home" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-home text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Inicio
                     </span>
@@ -63,7 +63,7 @@
             <!-- Opciones específicas para Administradores -->
             @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Administrador')
             <li>
-                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                <div class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Administración
                 </div>
@@ -71,10 +71,10 @@
 
             <li>
                 <a href="{{ route('admin.users.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.users.*') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.users.*') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-users" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-users text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Gestionar Usuarios
                     </span>
@@ -84,10 +84,10 @@
 
             <li>
                 <a href="{{ route('admin.fincas.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.fincas.*') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.fincas.*') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-warehouse" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-warehouse text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Gestionar Fincas
                     </span>
@@ -97,10 +97,10 @@
 
             <li>
                 <a href="{{ route('admin.lotes.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.lotes.*') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.lotes.*') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-layer-group" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-layer-group text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Gestionar Lotes
                     </span>
@@ -111,10 +111,10 @@
             <!-- Gestión de Aves (Admin) -->
             <li>
                 <a href="{{ route('admin.aves.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.aves.index') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.aves.index') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-dove" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-dove text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Gestionar Aves
                     </span>
@@ -123,10 +123,10 @@
             </li>
             <li>
                 <a href="{{ route('admin.aves.create') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.aves.create') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.aves.create') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Registrar Ave
                     </span>
@@ -137,10 +137,10 @@
             <!-- Gestión de Alimentación (Admin) -->
             <li>
                 <a href="{{ route('admin.alimentacion.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.alimentacion.index') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.alimentacion.index') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-utensils" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-utensils text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Gestión de Alimentación
                     </span>
@@ -149,10 +149,10 @@
             </li>
             <li>
                 <a href="{{ route('admin.alimentacion.create') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.alimentacion.create') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.alimentacion.create') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Registrar Alimentación
                     </span>
@@ -162,10 +162,10 @@
 
             <li>
                 <a href="{{ route('admin.reports.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.reports.*') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.reports.*') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-chart-bar" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-chart-bar text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Reportes Avanzados
                     </span>
@@ -179,10 +179,10 @@
             <!-- Producción de Huevos: Reportes -->
             <li>
                 <a href="{{ route('admin.produccion-huevos.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-egg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-egg text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Producción de Huevos
                     </span>
@@ -193,10 +193,10 @@
             <!-- Producción de Huevos: Registrar -->
             <li>
                 <a href="{{ route('admin.produccion-huevos.create') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Registrar Producción
                     </span>
@@ -215,10 +215,10 @@
             </li>
             <li>
                 <a href="{{ route('owner.produccion-huevos.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-egg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-egg text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Producción de Huevos
                     </span>
@@ -227,10 +227,10 @@
             </li>
             <li>
                 <a href="{{ route('owner.produccion-huevos.create') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Registrar Producción
                     </span>
@@ -249,10 +249,10 @@
             </li>
             <li>
                 <a href="{{ route('employee.produccion-huevos.index') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('employee.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('employee.produccion-huevos.index') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-egg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-egg text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Producción de Huevos
                     </span>
@@ -261,10 +261,10 @@
             </li>
             <li>
                 <a href="{{ route('employee.produccion-huevos.create') }}" 
-                   class="flex items-center p-3 text-white rounded hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('employee.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('employee.produccion-huevos.create') ? 'bg-blue-800' : '' }}"
                    :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
-                    <i class="fas fa-plus-circle" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-3'"></i>
-                    <span class="transition-opacity duration-300" 
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
                         Registrar Producción
                     </span>
@@ -307,16 +307,17 @@
         left: 100%;
         top: 50%;
         transform: translateY(-50%);
-        margin-left: 15px;
+        margin-left: 10px;
         background-color: #374151;
         color: white;
         text-align: center;
-        padding: 8px 12px;
+        padding: 6px 10px;
         border-radius: 6px;
-        font-size: 14px;
+        font-size: 13px;
         white-space: nowrap;
         z-index: 1000;
         transition: opacity 0.3s;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
     
     .tooltip-text::before {
