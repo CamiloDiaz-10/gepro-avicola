@@ -6,18 +6,24 @@
 <div class="p-6">
     <div class="max-w-7xl mx-auto">
         <!-- Page Header -->
-        <div class="mb-8">
-            <div class="flex justify-between items-center">
+        <div class="mb-8 bg-white rounded-lg shadow-lg p-6">
+            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
-                    <p class="mt-2 text-gray-600">Panel de control completo del sistema de gestión avícola</p>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
+                    <p class="mt-2 text-sm lg:text-base text-gray-600">Panel de control completo del sistema de gestión avícola</p>
                 </div>
-                <div class="flex space-x-3">
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-download mr-2"></i>Exportar Reportes
-                    </button>
-                    <a href="{{ route('admin.fincas.create') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-plus mr-2"></i>Nueva Finca
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <a href="{{ route('admin.reports.index') }}" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-medium">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Exportar </span>Reportes
+                    </a>
+                    <a href="{{ route('admin.fincas.create') }}" class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Nueva Finca
                     </a>
                 </div>
             </div>

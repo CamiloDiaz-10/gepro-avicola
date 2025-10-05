@@ -19,20 +19,47 @@
             </div>
         @endif
 
-        <div class="flex items-center justify-between gap-3 flex-wrap">
-            <form method="GET" action="{{ route('admin.lotes.index') }}" class="flex items-center gap-2">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por nombre o raza" class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <select name="finca" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todas las fincas</option>
-                    @foreach($fincas as $finca)
-                        <option value="{{ $finca->IDFinca }}" {{ request('finca') == $finca->IDFinca ? 'selected' : '' }}>
-                            {{ $finca->Nombre }} ({{ $finca->Ubicacion }})
-                        </option>
-                    @endforeach
-                </select>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Filtrar</button>
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800">Filtros de Búsqueda</h2>
+                    <p class="text-gray-500 text-sm">Busca por nombre, raza o finca</p>
+                </div>
+                <a href="{{ route('admin.lotes.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Nuevo Lote
+                </a>
+            </div>
+
+            <form method="GET" action="{{ route('admin.lotes.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Nombre o raza del lote" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Finca</label>
+                    <select name="finca" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Todas las fincas</option>
+                        @foreach($fincas as $finca)
+                            <option value="{{ $finca->IDFinca }}" {{ request('finca') == $finca->IDFinca ? 'selected' : '' }}>
+                                {{ $finca->Nombre }} ({{ $finca->Ubicacion }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+                        Filtrar
+                    </button>
+                    @if(request('search') || request('finca'))
+                        <a href="{{ route('admin.lotes.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                            Limpiar
+                        </a>
+                    @endif
+                </div>
             </form>
-            <a href="{{ route('admin.lotes.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Nuevo Lote</a>
         </div>
 
         <div class="overflow-x-auto bg-white rounded-lg shadow">

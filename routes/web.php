@@ -22,6 +22,9 @@ use App\Http\Controllers\Admin\SanidadController;
 // Ruta de inicio
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Ruta de bienvenida (alias para home)
+Route::get('/welcome', [HomeController::class, 'index'])->name('welcome');
+
 // Página offline (pública)
 Route::view('/offline', 'offline')->name('offline');
 

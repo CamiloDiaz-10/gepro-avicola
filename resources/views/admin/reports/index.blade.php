@@ -3,25 +3,51 @@
 @section('content')
 <div class="p-6">
     <div class="max-w-7xl mx-auto space-y-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Reportes Avanzados</h1>
-                <p class="text-gray-600">Analiza producción, alimentación, sanidad y finanzas</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('admin.reports.export.production', request()->query()) }}" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Exportar Producción</a>
-                <a href="{{ route('admin.reports.export.feeding', request()->query()) }}" class="px-3 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm">Exportar Alimentación</a>
-                <a href="{{ route('admin.reports.export.health', request()->query()) }}" class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Exportar Salud</a>
-                <a href="{{ route('admin.reports.export.finance', request()->query()) }}" class="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Exportar Finanzas</a>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Reportes Avanzados</h1>
+                    <p class="text-gray-600">Analiza producción, alimentación, sanidad y finanzas</p>
+                </div>
+                <div class="grid grid-cols-2 lg:flex lg:flex-wrap gap-2">
+                    <a href="{{ route('admin.reports.export.production', request()->query()) }}" class="inline-flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Exportar </span>Producción
+                    </a>
+                    <a href="{{ route('admin.reports.export.feeding', request()->query()) }}" class="inline-flex items-center justify-center px-3 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors text-sm font-medium">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Exportar </span>Alimentación
+                    </a>
+                    <a href="{{ route('admin.reports.export.health', request()->query()) }}" class="inline-flex items-center justify-center px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Exportar </span>Salud
+                    </a>
+                    <a href="{{ route('admin.reports.export.finance', request()->query()) }}" class="inline-flex items-center justify-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Exportar </span>Finanzas
+                    </a>
+                </div>
             </div>
         </div>
 
         <div class="bg-white rounded-lg shadow p-6">
-            <form method="GET" action="{{ route('admin.reports.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Filtros de Análisis</h2>
+                <p class="text-gray-500 text-sm">Selecciona el rango de fechas y la finca para analizar</p>
+            </div>
+            <form method="GET" action="{{ route('admin.reports.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-sm text-gray-700 mb-1">Finca</label>
-                    <select name="finca" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Todas</option>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Finca</label>
+                    <select name="finca" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Todas las fincas</option>
                         @foreach($fincas as $f)
                             <option value="{{ $f->IDFinca }}" {{ (string)request('finca') === (string)$f->IDFinca ? 'selected' : '' }}>
                                 {{ $f->Nombre }} ({{ $f->Ubicacion }})
@@ -30,15 +56,24 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-700 mb-1">Desde</label>
-                    <input type="date" name="desde" value="{{ request('desde') }}" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Desde</label>
+                    <input type="date" name="desde" value="{{ request('desde') }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-700 mb-1">Hasta</label>
-                    <input type="date" name="hasta" value="{{ request('hasta') }}" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Hasta</label>
+                    <input type="date" name="hasta" value="{{ request('hasta') }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
-                <div class="flex items-end">
-                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aplicar</button>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+                        Aplicar
+                    </button>
+                    @if(request('finca') || request('desde') || request('hasta'))
+                        <a href="{{ route('admin.reports.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </a>
+                    @endif
                 </div>
             </form>
         </div>
