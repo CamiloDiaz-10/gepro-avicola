@@ -29,7 +29,8 @@ class User extends Authenticatable
         'FechaNacimiento',
         'Direccion',
         'Contrasena',
-        'UrlImagen'
+        'UrlImagen',
+        'Estado'
     ];
 
     protected $hidden = [

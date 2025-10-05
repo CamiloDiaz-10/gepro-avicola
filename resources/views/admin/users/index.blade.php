@@ -130,25 +130,30 @@
                                 {{ $user->created_at->format('d/m/Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center justify-end space-x-2">
+                                <div class="flex items-center justify-end space-x-3">
+                                    <!-- Ver detalles -->
                                     <a href="{{ route('admin.users.show', $user) }}" 
-                                       class="text-blue-600 hover:text-blue-900" title="Ver detalles">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('admin.users.edit', $user) }}" 
-                                       class="text-indigo-600 hover:text-indigo-900" title="Editar">
-                                        <i class="fas fa-edit"></i>
+                                       class="text-blue-600 hover:text-blue-900 transition-colors" 
+                                       title="Ver detalles">
+                                        <i class="fas fa-eye text-lg"></i>
                                     </a>
                                     
-                                    <!-- Toggle Status -->
+                                    <!-- Editar -->
+                                    <a href="{{ route('admin.users.edit', $user) }}" 
+                                       class="text-blue-600 hover:text-blue-900 transition-colors" 
+                                       title="Editar">
+                                        <i class="fas fa-edit text-lg"></i>
+                                    </a>
+                                    
+                                    <!-- Toggle Status (Activar/Desactivar) -->
                                     <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}" class="inline">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" 
-                                                class="{{ ($user->Estado ?? 'Activo') === 'Activo' ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900' }}"
-                                                title="{{ ($user->Estado ?? 'Activo') === 'Activo' ? 'Desactivar' : 'Activar' }}"
+                                                class="text-orange-500 hover:text-orange-700 transition-colors"
+                                                title="{{ ($user->Estado ?? 'Activo') === 'Activo' ? 'Desactivar usuario' : 'Activar usuario' }}"
                                                 onclick="return confirm('¿Estás seguro de cambiar el estado de este usuario?')">
-                                            <i class="fas fa-{{ ($user->Estado ?? 'Activo') === 'Activo' ? 'user-slash' : 'user-check' }}"></i>
+                                            <i class="fas fa-user-slash text-lg"></i>
                                         </button>
                                     </form>
 
@@ -157,10 +162,10 @@
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" 
-                                                class="text-orange-600 hover:text-orange-900"
+                                                class="text-gray-800 hover:text-gray-600 transition-colors"
                                                 title="Restablecer contraseña"
-                                                onclick="return confirm('¿Estás seguro de restablecer la contraseña de este usuario?')">
-                                            <i class="fas fa-key"></i>
+                                                onclick="return confirm('¿Estás seguro de restablecer la contraseña de este usuario? La nueva contraseña será: password123')">
+                                            <i class="fas fa-key text-lg"></i>
                                         </button>
                                     </form>
 
@@ -170,12 +175,15 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 
-                                                class="text-red-600 hover:text-red-900"
-                                                title="Eliminar"
+                                                class="text-red-600 hover:text-red-800 transition-colors"
+                                                title="Eliminar usuario"
                                                 onclick="return confirm('¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.')">
-                                            <i class="fas fa-trash"></i>
+                                            <i class="fas fa-trash text-lg"></i>
                                         </button>
                                     </form>
+                                    @else
+                                    <!-- Placeholder para mantener alineación -->
+                                    <span class="inline-block w-5"></span>
                                     @endif
                                 </div>
                             </td>

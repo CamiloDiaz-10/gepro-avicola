@@ -133,15 +133,22 @@ class UserController extends Controller
     {
         $user->load(['role', 'fincas']);
         
-        // Estadísticas del usuario
+        // Estadísticas del usuario basadas en sus fincas asignadas
+        $fincaIds = $user->fincas->pluck('IDFinca')->toArray();
+        
         $stats = [
-            'registros_produccion' => $user->produccionHuevos()->count(),
+            'fincas_asignadas' => count($fincaIds),
+            'lotes_en_fincas' => DB::table('lotes')
+                ->whereIn('IDFinca', $fincaIds)
+                ->count(),
+            'registros_produccion' => DB::table('produccion_huevos')
+                ->join('lotes', 'produccion_huevos.IDLote', '=', 'lotes.IDLote')
+                ->whereIn('lotes.IDFinca', $fincaIds)
+                ->count(),
             'registros_sanidad' => DB::table('sanidad')
                 ->join('lotes', 'sanidad.IDLote', '=', 'lotes.IDLote')
-                ->join('usuario_finca', 'lotes.IDFinca', '=', 'usuario_finca.IDFinca')
-                ->where('usuario_finca.IDUsuario', $user->IDUsuario)
+                ->whereIn('lotes.IDFinca', $fincaIds)
                 ->count(),
-            'fincas_asignadas' => $user->fincas()->count(),
             'ultimo_acceso' => $user->updated_at
         ];
 

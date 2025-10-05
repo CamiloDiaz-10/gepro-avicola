@@ -153,23 +153,28 @@
                     <div class="space-y-4">
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-600">Fincas Asignadas</span>
-                            <span class="font-semibold">{{ $stats['fincas_asignadas'] }}</span>
+                            <span class="font-semibold text-blue-600">{{ $stats['fincas_asignadas'] }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Lotes en Fincas</span>
+                            <span class="font-semibold text-green-600">{{ $stats['lotes_en_fincas'] }}</span>
                         </div>
                         
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-600">Registros de Producción</span>
-                            <span class="font-semibold">{{ $stats['registros_produccion'] }}</span>
+                            <span class="font-semibold text-purple-600">{{ $stats['registros_produccion'] }}</span>
                         </div>
                         
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-600">Registros de Sanidad</span>
-                            <span class="font-semibold">{{ $stats['registros_sanidad'] }}</span>
+                            <span class="font-semibold text-orange-600">{{ $stats['registros_sanidad'] }}</span>
                         </div>
                         
                         <div class="border-t pt-4">
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-600">Último Acceso</span>
-                                <span class="text-sm font-semibold">
+                                <span class="text-sm font-semibold text-gray-700">
                                     {{ $stats['ultimo_acceso'] ? $stats['ultimo_acceso']->diffForHumans() : 'Nunca' }}
                                 </span>
                             </div>
