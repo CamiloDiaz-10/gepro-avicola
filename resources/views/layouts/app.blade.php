@@ -116,5 +116,54 @@
             });
         }
     </script>
+
+    <!-- Auto Logout al cerrar pestaña -->
+    <script>
+        (function() {
+            const logoutUrl = '{{ route("logout") }}';
+            const csrfToken = '{{ csrf_token() }}';
+            let isNavigating = false;
+            
+            // Función para enviar logout
+            function sendLogout() {
+                const formData = new FormData();
+                formData.append('_token', csrfToken);
+                navigator.sendBeacon(logoutUrl, formData);
+                console.log('Auto-logout enviado');
+            }
+            
+            // Detectar navegación interna (no cerrar sesión)
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.startsWith(window.location.origin)) {
+                    isNavigating = true;
+                    setTimeout(() => { isNavigating = false; }, 100);
+                }
+            });
+            
+            // Detectar cuando se cierra la pestaña/navegador
+            window.addEventListener('beforeunload', function(e) {
+                // Solo cerrar sesión si NO es navegación interna
+                if (!isNavigating) {
+                    sendLogout();
+                }
+            });
+            
+            // Detectar cuando la pestaña se oculta por mucho tiempo
+            let hideTimer;
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'hidden') {
+                    // Esperar 30 segundos antes de cerrar sesión
+                    // Esto evita cerrar sesión al cambiar de pestaña temporalmente
+                    hideTimer = setTimeout(() => {
+                        sendLogout();
+                    }, 30000); // 30 segundos
+                } else {
+                    // Si la pestaña vuelve a estar visible, cancelar el timer
+                    clearTimeout(hideTimer);
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
