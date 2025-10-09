@@ -10,6 +10,9 @@ use App\Models\TipoGallina;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Carbon\Carbon;
 
 class BirdsController extends Controller
@@ -103,16 +106,68 @@ class BirdsController extends Controller
     {
         try {
             $data = $request->validated();
-            Bird::create($data);
+            // Handle optional photo upload
+            if ($request->hasFile('Foto')) {
+                $path = $request->file('Foto')->store('birds', 'public');
+                $data['UrlImagen'] = $path; // stored relative path in public disk
+            }
 
-            return redirect()->route('admin.aves.index')
-                ->with('success', 'Ave registrada correctamente.');
+            // Generate QR token
+            $data['qr_token'] = (string) Str::uuid();
+
+            $created = Bird::create($data);
+
+            // Generate and store QR SVG on server (no GD/Imagick dependency)
+            try {
+                $qrUrl = route('admin.aves.show.byqr', $created->qr_token);
+                $svg = QrCode::format('svg')->size(256)->margin(1)->generate($qrUrl);
+                $qrPath = 'qrs/ave_'.$created->IDGallina.'_qr.svg';
+                Storage::disk('public')->put($qrPath, $svg);
+                $created->qr_image_path = $qrPath;
+                $created->save();
+            } catch (\Throwable $qe) {
+                Log::warning('No se pudo generar PNG del QR', ['id' => $created->IDGallina, 'err' => $qe->getMessage()]);
+            }
+
+            return redirect()->route('admin.aves.show.byqr', $created->qr_token)
+                ->with('success', 'Ave registrada correctamente. Aquí está su código QR.');
         } catch (\Throwable $e) {
             Log::error('Error creando ave', ['message' => $e->getMessage()]);
-            return back()->withInput()->with('error', 'No se pudo registrar el ave.');
+            $msg = 'No se pudo registrar el ave.';
+            if (app()->isLocal()) {
+                $msg .= ' Detalle: '.$e->getMessage();
+            }
+            return back()->withInput()->with('error', $msg);
         }
     }
 
+    public function scan()
+    {
+        return view('admin.aves.scan');
+    }
+
+    public function showByQr(string $token)
+    {
+        $bird = Bird::with(['lote', 'tipoGallina'])->where('qr_token', $token)->firstOrFail();
+        return view('admin.aves.show-by-qr', compact('bird'));
+    }
+
+    public function regenerateByQr(string $token)
+    {
+        $bird = Bird::where('qr_token', $token)->firstOrFail();
+        try {
+            $qrUrl = route('admin.aves.show.byqr', $bird->qr_token);
+            $svg = QrCode::format('svg')->size(512)->margin(1)->generate($qrUrl);
+            $qrPath = 'qrs/ave_'.$bird->IDGallina.'_qr.svg';
+            Storage::disk('public')->put($qrPath, $svg);
+            $bird->qr_image_path = $qrPath;
+            $bird->save();
+            return back()->with('success', 'QR regenerado correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error regenerando QR', ['id' => $bird->IDGallina, 'err' => $e->getMessage()]);
+            return back()->with('error', 'No se pudo regenerar el QR.');
+        }
+    }
     public function exportCsv(Request $request)
     {
         $loteId = $request->input('lote');
@@ -122,11 +177,11 @@ class BirdsController extends Controller
         $bornTo = $request->input('born_to');
 
         $rows = Bird::with(['lote','tipoGallina'])
-            ->when($loteId, fn($q) => $q->where('IDLote', $loteId))
-            ->when($tipoId, fn($q) => $q->where('IDTipoGallina', $tipoId))
-            ->when($estado, fn($q) => $q->where('Estado', $estado))
-            ->when($bornFrom, fn($q) => $q->whereDate('FechaNacimiento', '>=', $bornFrom))
-            ->when($bornTo, fn($q) => $q->whereDate('FechaNacimiento', '<=', $bornTo))
+            ->when($loteId, function($q) use ($loteId) { return $q->where('IDLote', $loteId); })
+            ->when($tipoId, function($q) use ($tipoId) { return $q->where('IDTipoGallina', $tipoId); })
+            ->when($estado, function($q) use ($estado) { return $q->where('Estado', $estado); })
+            ->when($bornFrom, function($q) use ($bornFrom) { return $q->whereDate('FechaNacimiento', '>=', $bornFrom); })
+            ->when($bornTo, function($q) use ($bornTo) { return $q->whereDate('FechaNacimiento', '<=', $bornTo); })
             ->orderBy('IDGallina')
             ->get(['IDGallina','IDLote','IDTipoGallina','FechaNacimiento','Estado']);
 
@@ -156,3 +211,4 @@ class BirdsController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 }
+

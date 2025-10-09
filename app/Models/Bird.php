@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Bird extends Model
 {
@@ -17,13 +18,25 @@ class Bird extends Model
         'IDTipoGallina',
         'FechaNacimiento',
         'Peso',
-        'Estado'
+        'Estado',
+        'UrlImagen',
+        'qr_token',
+        'qr_image_path'
     ];
 
     protected $casts = [
         'FechaNacimiento' => 'date',
         'Peso' => 'decimal:2'
     ];
+
+    protected static function booted()
+    {
+        static::creating(function (Bird $bird) {
+            if (empty($bird->qr_token)) {
+                $bird->qr_token = (string) Str::uuid();
+            }
+        });
+    }
 
     // Relationships
     public function lote()

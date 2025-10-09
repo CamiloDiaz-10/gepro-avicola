@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\FincaController;
 use App\Http\Controllers\Admin\LoteController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SanidadController;
+use App\Http\Controllers\Admin\BirdsController;
 // Controladores comentados hasta crearlos:
 // use App\Http\Controllers\UserController;
 // use App\Http\Controllers\RoleController;
@@ -27,6 +28,9 @@ Route::get('/welcome', [HomeController::class, 'index'])->name('welcome');
 
 // Página offline (pública)
 Route::view('/offline', 'offline')->name('offline');
+
+// Vista de QR de aves (PÚBLICA) para permitir escaneo sin autenticación
+Route::get('/admin/aves/qr/{token}', [BirdsController::class, 'showByQr'])->name('admin.aves.show.byqr');
 
 // Rutas de autenticación
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
@@ -129,6 +133,8 @@ Route::middleware('auth')->group(function () {
         Route::get('aves/create', [\App\Http\Controllers\Admin\BirdsController::class, 'create'])->name('aves.create');
         Route::post('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'store'])->name('aves.store');
         Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
+        Route::get('aves/scan', [\App\Http\Controllers\Admin\BirdsController::class, 'scan'])->name('aves.scan');
+        Route::post('aves/qr/{token}/regenerate', [\App\Http\Controllers\Admin\BirdsController::class, 'regenerateByQr'])->name('aves.qr.regenerate');
 
         // Gestión de Alimentación
         Route::get('alimentacion', [\App\Http\Controllers\Admin\AlimentacionController::class, 'index'])->name('alimentacion.index');

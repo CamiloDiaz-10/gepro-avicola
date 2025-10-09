@@ -18,7 +18,8 @@ class StoreBirdRequest extends FormRequest
             'IDTipoGallina' => ['required','integer','exists:tipo_gallinas,IDTipoGallina'],
             'FechaNacimiento' => ['required','date','before_or_equal:today'],
             'Peso' => ['nullable','numeric','min:0','max:10000'],
-            'Estado' => ['required','in:Viva,Muerta,Vendida,Trasladada']
+            'Estado' => ['required','in:Viva,Muerta,Vendida,Trasladada'],
+            'Foto' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:4096']
         ];
     }
 

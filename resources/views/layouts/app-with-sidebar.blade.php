@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>@yield('title', 'Gepro Avícola')</title>
     
     <!-- PWA: Manifest & Meta -->
@@ -13,7 +16,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Gepro Avícola">
-    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" href="/images/logo.jpg">
     
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -144,6 +147,7 @@
     </script>
 
     <!-- PWA: Service Worker Registration -->
+    @if(app()->environment('production'))
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -152,54 +156,18 @@
             });
         }
     </script>
-
-    <!-- Auto Logout al cerrar pestaña -->
+    @endif
+    @if(!app()->environment('production'))
     <script>
-        (function() {
-            const logoutUrl = '{{ route("logout") }}';
-            const csrfToken = '{{ csrf_token() }}';
-            let isNavigating = false;
-            
-            // Función para enviar logout
-            function sendLogout() {
-                const formData = new FormData();
-                formData.append('_token', csrfToken);
-                navigator.sendBeacon(logoutUrl, formData);
-                console.log('Auto-logout enviado');
-            }
-            
-            // Detectar navegación interna (no cerrar sesión)
-            document.addEventListener('click', function(e) {
-                const link = e.target.closest('a');
-                if (link && link.href && link.href.startsWith(window.location.origin)) {
-                    isNavigating = true;
-                    setTimeout(() => { isNavigating = false; }, 100);
-                }
+        // Unregister any existing service workers in non-production to avoid cached pages
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations && navigator.serviceWorker.getRegistrations().then(function(regs) {
+                regs.forEach(function(reg) { reg.unregister(); });
             });
-            
-            // Detectar cuando se cierra la pestaña/navegador
-            window.addEventListener('beforeunload', function(e) {
-                // Solo cerrar sesión si NO es navegación interna
-                if (!isNavigating) {
-                    sendLogout();
-                }
-            });
-            
-            // Detectar cuando la pestaña se oculta por mucho tiempo
-            let hideTimer;
-            document.addEventListener('visibilitychange', function() {
-                if (document.visibilityState === 'hidden') {
-                    // Esperar 30 segundos antes de cerrar sesión
-                    // Esto evita cerrar sesión al cambiar de pestaña temporalmente
-                    hideTimer = setTimeout(() => {
-                        sendLogout();
-                    }, 30000); // 30 segundos
-                } else {
-                    // Si la pestaña vuelve a estar visible, cancelar el timer
-                    clearTimeout(hideTimer);
-                }
-            });
-        })();
+        }
     </script>
+    @endif
+
+    <!-- Eliminado auto-logout frontal para evitar cierre de sesión durante navegación/recarga -->
 </body>
 </html>

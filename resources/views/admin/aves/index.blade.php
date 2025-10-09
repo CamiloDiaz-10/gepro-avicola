@@ -18,6 +18,9 @@
                     <a href="{{ route('admin.aves.export.csv', request()->query()) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
                         Exportar CSV
                     </a>
+                    <a href="{{ route('admin.aves.scan') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                        Escanear Código QR
+                    </a>
                 </div>
             </div>
 
@@ -99,6 +102,7 @@
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nacimiento</th>
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Peso (g)</th>
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -110,6 +114,13 @@
                                 <td class="px-4 py-2">{{ $b->FechaNacimiento ? \Carbon\Carbon::parse($b->FechaNacimiento)->format('d/m/Y') : '-' }}</td>
                                 <td class="px-4 py-2">{{ $b->Peso }}</td>
                                 <td class="px-4 py-2">{{ $b->Estado }}</td>
+                                <td class="px-4 py-2">
+                                    @if(!empty($b->qr_token))
+                                        <a href="{{ route('admin.aves.show.byqr', $b->qr_token) }}" class="text-sm text-indigo-600 hover:text-indigo-800">Ver QR</a>
+                                    @else
+                                        <span class="text-xs text-gray-400">Sin QR</span>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
