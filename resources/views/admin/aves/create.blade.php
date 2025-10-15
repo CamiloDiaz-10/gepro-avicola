@@ -62,10 +62,9 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                         <select name="Estado" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            <option value="Viva" {{ old('Estado') == 'Viva' ? 'selected' : '' }}>Viva</option>
+                            <option value="Activa" {{ old('Estado', 'Activa') == 'Activa' ? 'selected' : '' }}>Activa</option>
                             <option value="Muerta" {{ old('Estado') == 'Muerta' ? 'selected' : '' }}>Muerta</option>
                             <option value="Vendida" {{ old('Estado') == 'Vendida' ? 'selected' : '' }}>Vendida</option>
-                            <option value="Trasladada" {{ old('Estado') == 'Trasladada' ? 'selected' : '' }}>Trasladada</option>
                         </select>
                         @error('Estado')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>

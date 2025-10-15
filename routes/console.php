@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,3 +45,19 @@ Artisan::command('birds:generate-qr {--force : Regenerar PNG incluso si ya exist
 
     $this->info("QRs generados/actualizados: $count, omitidos: $skipped, errores: $errors");
 })->purpose('Genera tokens e imágenes de QR para todas las aves');
+
+Artisan::command('birds:normalize-states', function () {
+    $map = [
+        'Viva' => 'Activa',
+        'Fallecida' => 'Muerta',
+        'Trasladada' => 'Activa',
+    ];
+
+    $total = 0;
+    foreach ($map as $from => $to) {
+        $affected = DB::table('gallinas')->where('Estado', $from)->update(['Estado' => $to]);
+        $total += $affected;
+        $this->info("Actualizadas {$affected} aves de '{$from}' a '{$to}'.");
+    }
+    $this->info("Total actualizadas: {$total}");
+})->purpose('Normaliza estados de aves: Viva->Activa, Fallecida->Muerta, Trasladada->Activa');

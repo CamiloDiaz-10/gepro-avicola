@@ -262,7 +262,7 @@ class BirdsController extends Controller
             }
 
             $data = $request->validate([
-                'Estado' => 'required|in:Viva,Muerta,Vendida,Trasladada',
+                'Estado' => 'required|in:Activa,Muerta,Vendida',
             ]);
 
             $bird->Estado = $data['Estado'];

@@ -72,7 +72,7 @@
                                 <div>
                                     <label class="block text-xs text-gray-500 mb-1">Estado</label>
                                     <select name="Estado" class="rounded-md border-gray-300">
-                                        @foreach(['Viva','Muerta','Vendida','Trasladada'] as $estado)
+                                        @foreach(['Activa','Muerta','Vendida'] as $estado)
                                             <option value="{{ $estado }}" {{ $bird->Estado === $estado ? 'selected' : '' }}>{{ $estado }}</option>
                                         @endforeach
                                     </select>

@@ -67,7 +67,13 @@ class Bird extends Model
     // Scopes
     public function scopeVivas($query)
     {
-        return $query->where('Estado', 'Viva');
+        // Backward compatible name, now uses Activa
+        return $query->where('Estado', 'Activa');
+    }
+
+    public function scopeActivas($query)
+    {
+        return $query->where('Estado', 'Activa');
     }
 
     public function scopePorTipo($query, $tipoId)

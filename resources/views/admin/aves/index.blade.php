@@ -47,7 +47,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                     <select name="estado" class="w-full rounded-md border-gray-300">
                         <option value="">Todos</option>
-                        @foreach(['Viva','Muerta','Vendida','Trasladada'] as $estado)
+                        @foreach(['Activa','Muerta','Vendida'] as $estado)
                             <option value="{{ $estado }}" {{ $filters['estado'] == $estado ? 'selected' : '' }}>{{ $estado }}</option>
                         @endforeach
                     </select>
