@@ -57,8 +57,19 @@ class AuthController extends Controller
                 ])->withInput($request->except('Contrasena'));
             }
             
-            \Log::info('Contraseña correcta, iniciando sesión');
-            
+            \Log::info('Contraseña correcta, verificando estado de la cuenta');
+
+            // Bloquear acceso si el usuario está inactivo
+            if (($user->Estado ?? 'Activo') !== 'Activo') {
+                \Log::warning('Usuario inactivo intenta iniciar sesión', [
+                    'email' => $user->Email,
+                    'estado' => $user->Estado,
+                ]);
+                return back()->withErrors([
+                    'Email' => 'Tu cuenta está desactivada. Por favor, comunícate con el administrador para reactivarla.'
+                ])->withInput($request->except('Contrasena'));
+            }
+
             // Login sin "remember me" para que la sesión expire al cerrar el navegador
             auth()->login($user, false);
             
