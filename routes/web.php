@@ -132,6 +132,7 @@ Route::middleware('auth')->group(function () {
         Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
         Route::get('aves/create', [\App\Http\Controllers\Admin\BirdsController::class, 'create'])->name('aves.create');
         Route::post('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'store'])->name('aves.store');
+        Route::patch('aves/{bird}/estado', [\App\Http\Controllers\Admin\BirdsController::class, 'updateEstado'])->name('aves.estado.update');
         Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
         Route::get('aves/scan', [\App\Http\Controllers\Admin\BirdsController::class, 'scan'])->name('aves.scan');
         Route::post('aves/qr/{token}/regenerate', [\App\Http\Controllers\Admin\BirdsController::class, 'regenerateByQr'])->name('aves.qr.regenerate');
@@ -163,6 +164,7 @@ Route::middleware('auth')->group(function () {
         Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
         Route::get('aves/create', [\App\Http\Controllers\Admin\BirdsController::class, 'create'])->name('aves.create');
         Route::post('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'store'])->name('aves.store');
+        Route::patch('aves/{bird}/estado', [\App\Http\Controllers\Admin\BirdsController::class, 'updateEstado'])->name('aves.estado.update');
         Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
         Route::get('aves/scan', [\App\Http\Controllers\Admin\BirdsController::class, 'scan'])->name('aves.scan');
 

@@ -251,5 +251,28 @@ class BirdsController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    public function updateEstado(Request $request, \App\Models\Bird $bird)
+    {
+        try {
+            // If propietario, only allow updating birds in permitted lots
+            if ($this->isOwnerContext($request)) {
+                $permittedLots = $this->permittedLotIds($request);
+                abort_unless($permittedLots->contains((int) $bird->IDLote), 403);
+            }
+
+            $data = $request->validate([
+                'Estado' => 'required|in:Viva,Muerta,Vendida,Trasladada',
+            ]);
+
+            $bird->Estado = $data['Estado'];
+            $bird->save();
+
+            return back()->with('success', 'Estado actualizado correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error actualizando estado de ave', ['id' => $bird->IDGallina, 'err' => $e->getMessage()]);
+            return back()->with('error', 'No se pudo actualizar el estado.');
+        }
+    }
 }
 

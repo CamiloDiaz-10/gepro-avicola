@@ -8,14 +8,14 @@
         <div class="bg-white shadow rounded-lg p-6">
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-bold text-gray-800">Registrar Nueva Ave</h1>
-                <a href="{{ route('admin.aves.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Ver Aves</a>
+                <a href="{{ route(request()->routeIs('owner.*') ? 'owner.aves.index' : 'admin.aves.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Ver Aves</a>
             </div>
 
             @if(session('error'))
                 <div class="mb-4 p-3 rounded bg-red-100 text-red-700">{{ session('error') }}</div>
             @endif
 
-            <form action="{{ route('admin.aves.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="{{ route(request()->routeIs('owner.*') ? 'owner.aves.store' : 'admin.aves.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
 
                 <div>
@@ -72,7 +72,7 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4">
-                    <a href="{{ route('admin.aves.index') }}" class="px-4 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">Cancelar</a>
+                    <a href="{{ route(request()->routeIs('owner.*') ? 'owner.aves.index' : 'admin.aves.index') }}" class="px-4 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">Cancelar</a>
                     <button type="submit" class="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">Guardar</button>
                 </div>
             </form>
@@ -80,3 +80,4 @@
     </div>
 </div>
 @endsection
+

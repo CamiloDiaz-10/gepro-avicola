@@ -38,6 +38,11 @@ class Bird extends Model
         });
     }
 
+    public function getRouteKeyName()
+    {
+        return 'IDGallina';
+    }
+
     // Relationships
     public function lote()
     {
