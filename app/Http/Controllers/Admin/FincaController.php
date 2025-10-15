@@ -9,10 +9,21 @@ use Illuminate\Http\Request;
 
 class FincaController extends Controller
 {
+    private function isEmployeeContext(Request $request): bool
+    {
+        $user = $request->user();
+        return ($request->routeIs('employee.*')) || ($user && $user->role && $user->role->NombreRol === 'Empleado');
+    }
+
     // Display a listing of the resource.
     public function index(Request $request)
     {
         $query = Finca::query();
+
+        if ($this->isEmployeeContext($request)) {
+            $assignedIds = $request->user()->fincas()->pluck('fincas.IDFinca');
+            $query->whereIn('IDFinca', $assignedIds);
+        }
 
         if ($request->filled('search')) {
             $s = $request->string('search');
@@ -67,6 +78,11 @@ class FincaController extends Controller
     // Display the specified resource.
     public function show(Finca $finca)
     {
+        $request = request();
+        if ($this->isEmployeeContext($request)) {
+            $assignedIds = $request->user()->fincas()->pluck('fincas.IDFinca');
+            abort_unless($assignedIds->contains($finca->IDFinca), 403);
+        }
         $finca->load('users');
         return view('admin.fincas.show', compact('finca'));
     }

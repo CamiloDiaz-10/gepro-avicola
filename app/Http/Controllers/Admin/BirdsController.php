@@ -17,6 +17,20 @@ use Carbon\Carbon;
 
 class BirdsController extends Controller
 {
+    private function isOwnerContext(Request $request): bool
+    {
+        $user = $request->user();
+        return ($request->routeIs('owner.*')) || ($user && $user->role && $user->role->NombreRol === 'Propietario');
+    }
+
+    private function permittedLotIds(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) return collect();
+        $fincaIds = $user->fincas()->pluck('fincas.IDFinca');
+        return Lote::whereIn('IDFinca', $fincaIds)->pluck('IDLote');
+    }
+
     public function index(Request $request)
     {
         $loteId = $request->input('lote');
@@ -32,6 +46,12 @@ class BirdsController extends Controller
         }
 
         $query = Bird::with(['lote', 'tipoGallina']);
+
+        // Scope for propietario context
+        if ($this->isOwnerContext($request)) {
+            $permittedLots = $this->permittedLotIds($request);
+            $query->whereIn('IDLote', $permittedLots);
+        }
 
         if ($loteId) { $query->where('IDLote', $loteId); }
         if ($tipoId) { $query->where('IDTipoGallina', $tipoId); }
@@ -61,7 +81,13 @@ class BirdsController extends Controller
             ->orderBy('FechaNacimiento')
             ->get();
 
-        $lotes = Lote::orderBy('Nombre')->get(['IDLote','Nombre']);
+        // Limit lotes list when propietario
+        if ($this->isOwnerContext($request)) {
+            $permittedLots = $this->permittedLotIds($request);
+            $lotes = Lote::whereIn('IDLote', $permittedLots)->orderBy('Nombre')->get(['IDLote','Nombre']);
+        } else {
+            $lotes = Lote::orderBy('Nombre')->get(['IDLote','Nombre']);
+        }
         $tipos = TipoGallina::orderBy('Nombre')->get(['IDTipoGallina','Nombre']);
 
         return view('admin.aves.index', [
@@ -91,7 +117,13 @@ class BirdsController extends Controller
 
     public function create()
     {
-        $lotes = Lote::orderBy('Nombre')->get(['IDLote','Nombre']);
+        $request = request();
+        if ($this->isOwnerContext($request)) {
+            $permittedLots = $this->permittedLotIds($request);
+            $lotes = Lote::whereIn('IDLote', $permittedLots)->orderBy('Nombre')->get(['IDLote','Nombre']);
+        } else {
+            $lotes = Lote::orderBy('Nombre')->get(['IDLote','Nombre']);
+        }
         $tipos = TipoGallina::orderBy('Nombre')->get(['IDTipoGallina','Nombre']);
         $hoy = Carbon::now()->toDateString();
 
@@ -106,6 +138,11 @@ class BirdsController extends Controller
     {
         try {
             $data = $request->validated();
+            // If propietario, ensure target lot is permitted
+            if ($this->isOwnerContext($request)) {
+                $permittedLots = $this->permittedLotIds($request);
+                abort_unless($permittedLots->contains((int)($data['IDLote'] ?? 0)), 403);
+            }
             // Handle optional photo upload
             if ($request->hasFile('Foto')) {
                 $path = $request->file('Foto')->store('birds', 'public');
@@ -177,6 +214,10 @@ class BirdsController extends Controller
         $bornTo = $request->input('born_to');
 
         $rows = Bird::with(['lote','tipoGallina'])
+            ->when($this->isOwnerContext($request), function($q) use ($request) {
+                $permitted = $this->permittedLotIds($request);
+                $q->whereIn('IDLote', $permitted);
+            })
             ->when($loteId, function($q) use ($loteId) { return $q->where('IDLote', $loteId); })
             ->when($tipoId, function($q) use ($tipoId) { return $q->where('IDTipoGallina', $tipoId); })
             ->when($estado, function($q) use ($estado) { return $q->where('Estado', $estado); })

@@ -237,6 +237,58 @@
                     <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Producción</span>
                 </a>
             </li>
+
+            <!-- Owner: Aves -->
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Aves
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('owner.aves.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.aves.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-dove text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Mis Aves
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Mis Aves</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('owner.aves.create') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.aves.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Ave
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Ave</span>
+                </a>
+            </li>
+
+            <!-- Owner: Reportes -->
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Reportes
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('owner.reports.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.reports.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-chart-bar text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Reportes
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Reportes</span>
+                </a>
+            </li>
             @endif
 
             <!-- Opciones específicas para Empleados -->
@@ -269,6 +321,31 @@
                         Registrar Producción
                     </span>
                     <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Producción</span>
+                </a>
+            </li>
+
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Fincas
+                </div>
+            </li>
+            <li>
+                @php($empFarmsCount = auth()->check() ? optional(auth()->user()->fincas())->count() : 0)
+                <a href="{{ route('employee.fincas.index') }}" 
+                   class="flex items-center justify-between p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative {{ request()->routeIs('employee.fincas.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <div class="flex items-center">
+                        <i class="fas fa-warehouse text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                        <span class="text-sm sm:text-base transition-opacity duration-300" 
+                              :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                            Mis Fincas
+                        </span>
+                    </div>
+                    <span class="ml-2 inline-flex items-center justify-center text-xs font-semibold bg-blue-700 rounded-full px-2 py-0.5"
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                        {{ $empFarmsCount }}
+                    </span>
                 </a>
             </li>
             @endif

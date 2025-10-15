@@ -11,6 +11,8 @@
             <h1 class="text-3xl font-semibold text-gray-900">Panel de Empleado</h1>
             <p class="text-gray-600 mt-1">Bienvenido, {{ auth()->user()->Nombre }} {{ auth()->user()->Apellido }}</p>
         </div>
+
+    
         <div class="flex items-center space-x-4">
             <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                 Empleado
@@ -51,7 +53,7 @@
                         <i class="fas fa-tasks text-white text-2xl"></i>
                     </div>
                     <div class="ml-4">
-                        <h3 class="text-lg font-medium text-gray-900">Tareas de Hoy</h3>
+                        <h3 class="text-lg font-medium text-gray-900">Producción de Hoy</h3>
                         <p class="mt-1 text-3xl font-semibold text-green-600">
                             {{ $statistics['todayTasks'] ?? 0 }}
                         </p>

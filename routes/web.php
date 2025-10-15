@@ -158,6 +158,20 @@ Route::middleware('auth')->group(function () {
         Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
         Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
         Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
+
+        // Aves (Propietario) reutilizando controlador Admin
+        Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
+        Route::get('aves/create', [\App\Http\Controllers\Admin\BirdsController::class, 'create'])->name('aves.create');
+        Route::post('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'store'])->name('aves.store');
+        Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
+        Route::get('aves/scan', [\App\Http\Controllers\Admin\BirdsController::class, 'scan'])->name('aves.scan');
+
+        // Reportes (Propietario) reutilizando controlador Admin
+        Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/export/production', [\App\Http\Controllers\Admin\ReportController::class, 'exportProduction'])->name('reports.export.production');
+        Route::get('reports/export/feeding', [\App\Http\Controllers\Admin\ReportController::class, 'exportFeeding'])->name('reports.export.feeding');
+        Route::get('reports/export/health', [\App\Http\Controllers\Admin\ReportController::class, 'exportHealth'])->name('reports.export.health');
+        Route::get('reports/export/finance', [\App\Http\Controllers\Admin\ReportController::class, 'exportFinance'])->name('reports.export.finance');
     });
     
     // Rutas específicas para empleados 
@@ -167,5 +181,9 @@ Route::middleware('auth')->group(function () {
         Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
         Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
         Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
+
+        // Fincas asignadas (Empleado) reutilizando controlador Admin
+        Route::get('fincas', [\App\Http\Controllers\Admin\FincaController::class, 'index'])->name('fincas.index');
+        Route::get('fincas/{finca}', [\App\Http\Controllers\Admin\FincaController::class, 'show'])->name('fincas.show');
     });
 });

@@ -12,13 +12,13 @@
                     <p class="text-gray-500 text-sm">Filtra por lote, tipo, estado y fecha de nacimiento</p>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('admin.aves.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                    <a href="{{ route(request()->routeIs('owner.*') ? 'owner.aves.create' : 'admin.aves.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         Registrar Ave
                     </a>
-                    <a href="{{ route('admin.aves.export.csv', request()->query()) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+                    <a href="{{ route(request()->routeIs('owner.*') ? 'owner.aves.export.csv' : 'admin.aves.export.csv', request()->query()) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
                         Exportar CSV
                     </a>
-                    <a href="{{ route('admin.aves.scan') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                    <a href="{{ route(request()->routeIs('owner.*') ? 'owner.aves.scan' : 'admin.aves.scan') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                         Escanear Código QR
                     </a>
                 </div>

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Bird;
 use App\Models\EggProduction;
@@ -13,12 +14,54 @@ class DashboardService
 {
     public function getStatistics()
     {
-        return [
+        $base = [
             'users' => $this->getUserStatistics(),
             'birds' => $this->getBirdStatistics(),
             'eggProduction' => $this->getEggProductionStatistics(),
             'health' => $this->getHealthStatistics(),
             'inventory' => $this->getInventoryStatistics(),
+        ];
+
+        $user = auth()->user();
+        $role = $user && $user->role ? $user->role->NombreRol : null;
+        if ($role === 'Empleado') {
+            $base = array_merge($base, $this->getEmployeeStatistics());
+        }
+
+        return $base;
+    }
+
+    public function getEmployeeStatistics(): array
+    {
+        $user = auth()->user();
+        $assignedFarms = 0;
+        $farms = collect();
+        $eggsToday = 0;
+        if ($user) {
+            try {
+                $farms = $user->fincas()->select('fincas.IDFinca','fincas.Nombre','fincas.Ubicacion')->orderBy('Nombre')->get();
+                $assignedFarms = $farms->count();
+                if (Schema::hasTable('produccion_huevos')) {
+                    $fincaIds = $farms->pluck('IDFinca');
+                    if ($fincaIds->isNotEmpty()) {
+                        $eggsToday = DB::table('produccion_huevos as ph')
+                            ->join('lotes as l','ph.IDLote','=','l.IDLote')
+                            ->whereIn('l.IDFinca', $fincaIds)
+                            ->whereDate('ph.Fecha', now()->toDateString())
+                            ->sum('ph.CantidadHuevos');
+                    }
+                }
+            } catch (\Throwable $e) {
+                $assignedFarms = 0;
+                $farms = collect();
+            }
+        }
+        return [
+            'assignedFarms' => $assignedFarms,
+            'assignedFarmsList' => $farms,
+            'eggsToday' => (int) $eggsToday,
+            'todayTasks' => (int) $eggsToday,
+            'pendingReports' => 0,
         ];
     }
 

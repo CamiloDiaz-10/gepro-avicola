@@ -9,12 +9,14 @@
                     <h1 class="text-2xl font-bold text-gray-900">Gestión de Fincas</h1>
                     <p class="text-gray-600">Administra las fincas registradas en el sistema</p>
                 </div>
+                @if(!request()->routeIs('employee.*'))
                 <a href="{{ route('admin.fincas.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium shadow-md">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     Nueva Finca
                 </a>
+                @endif
             </div>
 
             @if(session('success'))
@@ -28,7 +30,7 @@
                 </div>
             @endif
 
-            <form method="GET" action="{{ route('admin.fincas.index') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <form method="GET" action="{{ route(request()->routeIs('employee.*') ? 'employee.fincas.index' : 'admin.fincas.index') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="sm:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Nombre o ubicación de la finca" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -41,7 +43,7 @@
                         Buscar
                     </button>
                     @if(request('search'))
-                        <a href="{{ route('admin.fincas.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                        <a href="{{ route(request()->routeIs('employee.*') ? 'employee.fincas.index' : 'admin.fincas.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
@@ -90,19 +92,21 @@
                     </div>
 
                     <div class="mt-4 pt-4 border-t flex flex-wrap items-center gap-2">
-                        <a href="{{ route('admin.fincas.show', $finca) }}" class="flex-1 sm:flex-none px-3 py-2 text-center text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
+                        <a href="{{ route(request()->routeIs('employee.*') ? 'employee.fincas.show' : 'admin.fincas.show', $finca) }}" class="flex-1 sm:flex-none px-3 py-2 text-center text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
                             Ver
                         </a>
-                        <a href="{{ route('admin.fincas.edit', $finca) }}" class="flex-1 sm:flex-none px-3 py-2 text-center text-sm font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 rounded-md transition-colors">
-                            Editar
-                        </a>
-                        <form action="{{ route('admin.fincas.destroy', $finca) }}" method="POST" onsubmit="return confirm('¿Eliminar esta finca?');" class="flex-1 sm:flex-none sm:ml-auto">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="w-full px-3 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors">
-                                Eliminar
-                            </button>
-                        </form>
+                        @if(!request()->routeIs('employee.*'))
+                            <a href="{{ route('admin.fincas.edit', $finca) }}" class="flex-1 sm:flex-none px-3 py-2 text-center text-sm font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 rounded-md transition-colors">
+                                Editar
+                            </a>
+                            <form action="{{ route('admin.fincas.destroy', $finca) }}" method="POST" onsubmit="return confirm('¿Eliminar esta finca?');" class="flex-1 sm:flex-none sm:ml-auto">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-full px-3 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors">
+                                    Eliminar
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -111,13 +115,17 @@
                         <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
-                        <p class="text-gray-600">No hay fincas registradas.</p>
-                        <a href="{{ route('admin.fincas.create') }}" class="inline-flex items-center mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            Crear Primera Finca
-                        </a>
+                        @if(request()->routeIs('employee.*'))
+                            <p class="text-gray-600">No tienes fincas asignadas.</p>
+                        @else
+                            <p class="text-gray-600">No hay fincas registradas.</p>
+                            <a href="{{ route('admin.fincas.create') }}" class="inline-flex items-center mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Crear Primera Finca
+                            </a>
+                        @endif
                     </div>
                 </div>
             @endforelse

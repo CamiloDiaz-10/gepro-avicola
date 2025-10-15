@@ -6,16 +6,20 @@
 <div class="p-6" x-data>
     <div class="max-w-3xl mx-auto">
         <div class="bg-white shadow rounded-lg p-6">
+            @php
+                $current = Route::currentRouteName();
+                $area = \Illuminate\Support\Str::startsWith($current, 'owner.') ? 'owner' : (\Illuminate\Support\Str::startsWith($current, 'employee.') ? 'employee' : 'admin');
+            @endphp
             <div class="flex items-center justify-between mb-4">
                 <h1 class="text-2xl font-bold text-gray-800">Registrar Producción de Huevos (Hoy)</h1>
-                <a href="{{ route('admin.produccion-huevos.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Ver Reportes</a>
+                <a href="{{ route($area.'.produccion-huevos.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Ver Reportes</a>
             </div>
 
             @if(session('error'))
                 <div class="mb-4 p-3 rounded bg-red-100 text-red-700">{{ session('error') }}</div>
             @endif
 
-            <form action="{{ route('admin.produccion-huevos.store') }}" method="POST" class="space-y-4">
+            <form action="{{ route($area.'.produccion-huevos.store') }}" method="POST" class="space-y-4">
                 @csrf
 
                 <div>
@@ -83,7 +87,7 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4">
-                    <a href="{{ route('admin.produccion-huevos.index') }}" class="px-4 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">Cancelar</a>
+                    <a href="{{ route($area.'.produccion-huevos.index') }}" class="px-4 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">Cancelar</a>
                     <button type="submit" class="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">Guardar</button>
                 </div>
             </form>

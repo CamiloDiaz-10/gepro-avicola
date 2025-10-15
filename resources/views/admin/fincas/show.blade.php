@@ -9,8 +9,10 @@
                 <p class="text-gray-600">Detalles de la finca</p>
             </div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.fincas.edit', $finca) }}" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Editar</a>
-                <a href="{{ route('admin.fincas.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">Volver</a>
+                @if(!request()->routeIs('employee.*'))
+                    <a href="{{ route('admin.fincas.edit', $finca) }}" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Editar</a>
+                @endif
+                <a href="{{ route(request()->routeIs('employee.*') ? 'employee.fincas.index' : 'admin.fincas.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">Volver</a>
             </div>
         </div>
 
@@ -81,14 +83,16 @@
             </div>
 
             <div class="space-y-6">
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Acciones</h2>
-                    <form action="{{ route('admin.fincas.destroy', $finca) }}" method="POST" onsubmit="return confirm('¿Eliminar esta finca?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Eliminar</button>
-                    </form>
-                </div>
+                @if(!request()->routeIs('employee.*'))
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Acciones</h2>
+                        <form action="{{ route('admin.fincas.destroy', $finca) }}" method="POST" onsubmit="return confirm('¿Eliminar esta finca?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Eliminar</button>
+                        </form>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
