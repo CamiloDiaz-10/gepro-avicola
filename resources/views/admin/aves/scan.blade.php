@@ -8,7 +8,7 @@
         <div class="bg-white shadow rounded-lg p-6 space-y-4">
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-bold text-gray-800">Escanear Código QR</h1>
-                <a href="{{ route('admin.aves.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Volver</a>
+                <a href="{{ route(request()->routeIs('owner.*') ? 'owner.aves.index' : 'admin.aves.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Volver</a>
             </div>
             <p class="text-sm text-gray-600">Apunta la cámara al QR del ave para ver su información.</p>
 
@@ -34,7 +34,7 @@
                            class="flex-1 rounded-md border-gray-300" />
                     <button id="goManual" class="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">Ir</button>
                 </div>
-                <div class="text-xs text-gray-500 mt-2">El token es un UUID como 123e4567-e89b-12d3-a456-426614174000 o una URL que contenga /aves/qr/{token}.</div>
+                <div class="text-xs text-gray-500 mt-2">El token es un UUID como 123e4567-e89b-12d3-a456-426614174000 o una URL que contenga /admin/aves/qr/{token}.</div>
             </div>
 
             <div class="text-xs text-gray-500">Si no funciona la cámara, verifica permisos del navegador y usa HTTPS o <code>http://127.0.0.1</code>.</div>
@@ -84,13 +84,13 @@
         }
 
         function extractToken(text) {
-            // 1) Try URL pattern .../aves/qr/{uuid}
-            let m = text.match(/\/aves\/qr\/([0-9a-fA-F-]{36})/);
+            // 1) Try URL pattern .../admin/aves/qr/{uuid} or .../aves/qr/{uuid}
+            let m = text.match(/\/(?:admin\/)?aves\/qr\/([0-9a-fA-F-]{36})/);
             if (m && m[1]) return m[1];
             // 2) If full URL with query/fragment, strip and re-check
             try {
                 const u = new URL(text);
-                const m2 = u.pathname.match(/\/aves\/qr\/([0-9a-fA-F-]{36})/);
+                const m2 = u.pathname.match(/\/(?:admin\/)?aves\/qr\/([0-9a-fA-F-]{36})/);
                 if (m2 && m2[1]) return m2[1];
             } catch(_) {}
             // 3) If it's a raw UUID
@@ -110,7 +110,15 @@
             window.location.href = url;
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
+        async function onScanSuccess(decodedText, decodedResult) {
+            // Detener el escáner antes de navegar
+            try {
+                if (html5Qr && html5Qr.isScanning) {
+                    await html5Qr.stop();
+                }
+            } catch (e) {
+                console.log('Error deteniendo escáner:', e);
+            }
             navigateWithToken(decodedText);
         }
         function onScanError(errorMessage) { /* ruido normal de detección */ }

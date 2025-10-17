@@ -185,7 +185,12 @@ class BirdsController extends Controller
 
     public function showByQr(string $token)
     {
-        $bird = Bird::with(['lote', 'tipoGallina'])->where('qr_token', $token)->firstOrFail();
+        $bird = Bird::with(['lote', 'tipoGallina'])->where('qr_token', $token)->first();
+        
+        if (!$bird) {
+            return view('admin.aves.qr-not-found', compact('token'));
+        }
+        
         return view('admin.aves.show-by-qr', compact('bird'));
     }
 
