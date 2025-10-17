@@ -18,8 +18,35 @@
     <meta name="apple-mobile-web-app-title" content="Gepro Avícola">
     <link rel="apple-touch-icon" href="/images/logo.jpg">
     
+    <!-- Theme Manager Script (debe cargarse primero para evitar flash) -->
+    <script src="{{ asset('js/theme-manager.js') }}"></script>
+    
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                    },
+                },
+            },
+        }
+    </script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -41,7 +68,7 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
     <!-- Alpine.js Data Container -->
     <div x-data="{ 
         sidebarOpen: false, 
@@ -81,13 +108,13 @@
             
             <!-- Footer -->
             @auth
-            <footer class="bg-white border-t border-gray-200 mt-auto">
+            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
                 <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center">
-                        <div class="text-sm text-gray-500">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
                             © {{ date('Y') }} Gepro Avícola. Todos los derechos reservados.
                         </div>
-                        <div class="text-sm text-gray-500">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
                             Versión 1.0.0
                         </div>
                     </div>

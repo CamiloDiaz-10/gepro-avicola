@@ -15,8 +15,20 @@
     <meta name="apple-mobile-web-app-title" content="Gepro Avícola">
     <link rel="apple-touch-icon" href="/images/logo.jpg">
     
+    <!-- Theme Manager Script (debe cargarse primero para evitar flash) -->
+    <script src="{{ asset('js/theme-manager.js') }}"></script>
+    
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    
+    <!-- Alpine.js -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

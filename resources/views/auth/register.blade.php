@@ -4,7 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Gepro Avícola</title>
+    
+    <!-- Theme Manager Script -->
+    <script src="{{ asset('js/theme-manager.js') }}"></script>
+    
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.3.4/dist/forms.min.css" rel="stylesheet">
     <style>
         /* Fondo con imagen opaca */
@@ -42,6 +52,11 @@
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
         
+        .dark .glass-effect {
+            background: rgba(31, 41, 55, 0.95);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        
         /* Estilos para inputs y selects */
         select, input, textarea {
             width: 100%;
@@ -52,10 +67,24 @@
             transition: all 0.3s ease;
         }
         
+        .dark select, .dark input, .dark textarea {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: white;
+        }
+        
         select:focus, input:focus, textarea:focus {
             outline: none;
             border-color: #10b981;
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #9ca3af;
+        }
+        
+        .dark input::placeholder, .dark textarea::placeholder {
+            color: #6b7280;
         }
         
         select {
@@ -109,6 +138,11 @@
             margin-bottom: 1.5rem;
         }
         
+        .dark .form-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border-left: 4px solid #10b981;
+        }
+        
         .form-section-title {
             color: #047857;
             font-size: 1.125rem;
@@ -117,6 +151,46 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+        
+        .dark .form-section-title {
+            color: #10b981;
+        }
+        
+        /* Labels */
+        label {
+            color: #374151;
+        }
+        
+        .dark label {
+            color: #e5e7eb;
+        }
+        
+        /* Textos de ayuda */
+        .text-gray-500 {
+            color: #6b7280;
+        }
+        
+        .dark .text-gray-500 {
+            color: #9ca3af;
+        }
+        
+        /* Títulos */
+        h2 {
+            color: #1f2937;
+        }
+        
+        .dark h2 {
+            color: #ffffff;
+        }
+        
+        /* Párrafos */
+        p {
+            color: #4b5563;
+        }
+        
+        .dark p:not(.text-red-600):not(.required-badge) {
+            color: #d1d5db;
         }
         
         /* Input con icono */

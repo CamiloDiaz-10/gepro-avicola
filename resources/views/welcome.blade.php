@@ -3,7 +3,12 @@
 @section('title', 'Bienvenido - Gepro Avícola')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+    <!-- Theme Toggle - Posición fija en la esquina superior derecha -->
+    <div class="fixed top-4 right-4 z-50">
+        <x-theme-toggle />
+    </div>
+    
     <div class="container mx-auto px-4 py-16">
         <!-- Hero Section -->
         <div class="text-center mb-16">
@@ -32,18 +37,18 @@
                     <div class="absolute inset-0 rounded-full bg-green-400 opacity-20 blur-xl transform scale-110 group-hover:opacity-30 transition-opacity duration-300"></div>
                 </div>
             </div>
-            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-                Bienvenido a <span class="text-green-600">Gepro Avícola</span>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-4">
+                Bienvenido a <span class="text-green-600 dark:text-green-400">Gepro Avícola</span>
             </h1>
-            <p class="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-6 sm:mb-8 px-4">
+            <p class="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-6 sm:mb-8 px-4">
                 Sistema integral de gestión avícola para el control y monitoreo de granjas, 
                 producción de huevos, salud animal y optimización de recursos.
             </p>
             
             @auth
                 <div class="space-y-4 px-4">
-                    <p class="text-base sm:text-lg text-gray-700">
-                        ¡Hola, <span class="font-semibold text-green-600">{{ auth()->user()->Nombre }}</span>! 
+                    <p class="text-base sm:text-lg text-gray-700 dark:text-gray-200">
+                        ¡Hola, <span class="font-semibold text-green-600 dark:text-green-400">{{ auth()->user()->Nombre }}</span>! 
                         Bienvenido de vuelta.
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 max-w-md mx-auto">
@@ -85,57 +90,57 @@
 
         <!-- Features Section -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16 px-4">
-            <div class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Control de Producción</h3>
-                <p class="text-sm sm:text-base text-gray-600">Monitoreo en tiempo real de la producción de huevos, calidad y rendimiento por lote.</p>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">Control de Producción</h3>
+                <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">Monitoreo en tiempo real de la producción de huevos, calidad y rendimiento por lote.</p>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Gestión de Salud</h3>
-                <p class="text-sm sm:text-base text-gray-600">Seguimiento de la salud animal, tratamientos veterinarios y control de mortalidad.</p>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">Gestión de Salud</h3>
+                <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">Seguimiento de la salud animal, tratamientos veterinarios y control de mortalidad.</p>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300 sm:col-span-2 lg:col-span-1">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300 sm:col-span-2 lg:col-span-1">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Reportes y Analytics</h3>
-                <p class="text-sm sm:text-base text-gray-600">Informes detallados y análisis de datos para la toma de decisiones estratégicas.</p>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">Reportes y Analytics</h3>
+                <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">Informes detallados y análisis de datos para la toma de decisiones estratégicas.</p>
             </div>
         </div>
 
         <!-- Stats Section (only for authenticated users) -->
         @auth
-        <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8 mx-4">
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-6 text-center">Resumen del Sistema</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 mx-4">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Resumen del Sistema</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                <div class="text-center p-4 bg-green-50 rounded-lg">
-                    <div class="text-2xl sm:text-3xl font-bold text-green-600 mb-2">{{ \App\Models\User::count() }}</div>
-                    <div class="text-xs sm:text-sm text-gray-600">Usuarios Registrados</div>
+                <div class="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                    <div class="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-2">{{ \App\Models\User::count() }}</div>
+                    <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Usuarios Registrados</div>
                 </div>
-                <div class="text-center p-4 bg-blue-50 rounded-lg">
-                    <div class="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{{ \App\Models\Bird::count() }}</div>
-                    <div class="text-xs sm:text-sm text-gray-600">Aves en Sistema</div>
+                <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                    <div class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{{ \App\Models\Bird::count() }}</div>
+                    <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Aves en Sistema</div>
                 </div>
-                <div class="text-center p-4 bg-purple-50 rounded-lg">
-                    <div class="text-2xl sm:text-3xl font-bold text-purple-600 mb-2">{{ \App\Models\EggProduction::sum('CantidadHuevos') ?? 0 }}</div>
-                    <div class="text-xs sm:text-sm text-gray-600">Huevos Producidos</div>
+                <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+                    <div class="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">{{ \App\Models\EggProduction::sum('CantidadHuevos') ?? 0 }}</div>
+                    <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Huevos Producidos</div>
                 </div>
-                <div class="text-center p-4 bg-orange-50 rounded-lg">
-                    <div class="text-2xl sm:text-3xl font-bold text-orange-600 mb-2">{{ \Illuminate\Support\Facades\Schema::hasTable('fincas') ? \App\Models\Finca::count() : 0 }}</div>
-                    <div class="text-xs sm:text-sm text-gray-600">Fincas Registradas</div>
+                <div class="text-center p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg">
+                    <div class="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">{{ \Illuminate\Support\Facades\Schema::hasTable('fincas') ? \App\Models\Finca::count() : 0 }}</div>
+                    <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Fincas Registradas</div>
                 </div>
             </div>
         </div>

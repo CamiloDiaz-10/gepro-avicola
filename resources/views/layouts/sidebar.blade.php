@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<aside class="bg-blue-900 text-white h-screen fixed left-0 top-0 transform transition-all duration-300 ease-in-out z-30 flex flex-col overflow-y-hidden"
+<aside class="bg-blue-900 dark:bg-gray-800 text-white h-screen fixed left-0 top-0 transform transition-all duration-300 ease-in-out z-30 flex flex-col overflow-y-hidden"
        :class="{
            'translate-x-0': sidebarOpen || window.innerWidth >= 768,
            '-translate-x-full': !sidebarOpen && window.innerWidth < 768,
@@ -7,7 +7,7 @@
            'w-16': sidebarCollapsed && window.innerWidth >= 768
        }">
     <!-- Logo -->
-    <div class="p-4 sm:p-6 border-b border-blue-800">
+    <div class="p-4 sm:p-6 border-b border-blue-800 dark:border-gray-700">
         <h1 class="text-xl sm:text-2xl font-bold transition-opacity duration-300" 
             :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0' : 'opacity-100'">
             Gepro Avícola
