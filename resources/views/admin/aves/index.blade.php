@@ -115,11 +115,19 @@
                                 <td class="px-4 py-2">{{ $b->Peso }}</td>
                                 <td class="px-4 py-2">{{ $b->Estado }}</td>
                                 <td class="px-4 py-2">
-                                    @if(!empty($b->qr_token))
-                                        <a href="{{ route('admin.aves.show.byqr', $b->qr_token) }}" class="text-sm text-indigo-600 hover:text-indigo-800">Ver QR</a>
-                                    @else
-                                        <span class="text-xs text-gray-400">Sin QR</span>
-                                    @endif
+                                    <div class="flex items-center gap-3">
+                                        @if(!empty($b->qr_token))
+                                            <a href="{{ route('admin.aves.show.byqr', $b->qr_token) }}" class="text-sm text-indigo-600 hover:text-indigo-800">Ver QR</a>
+                                        @else
+                                            <span class="text-xs text-gray-400">Sin QR</span>
+                                        @endif
+
+                                        <form method="POST" action="{{ route(request()->routeIs('owner.*') ? 'owner.aves.destroy' : 'admin.aves.destroy', $b->IDGallina) }}" onsubmit="return confirm('¿Eliminar ave definitivamente?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-sm text-red-600 hover:text-red-800">Eliminar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

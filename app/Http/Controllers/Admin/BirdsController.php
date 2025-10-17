@@ -274,5 +274,32 @@ class BirdsController extends Controller
             return back()->with('error', 'No se pudo actualizar el estado.');
         }
     }
-}
 
+    public function destroy(Request $request, \App\Models\Bird $bird)
+    {
+        try {
+            // Si es propietario, validar que el ave pertenezca a un lote permitido
+            if ($this->isOwnerContext($request)) {
+                $permittedLots = $this->permittedLotIds($request);
+                abort_unless($permittedLots->contains((int) $bird->IDLote), 403);
+            }
+
+            // Eliminar imagen de QR si existe
+            if (!empty($bird->qr_image_path)) {
+                try {
+                    Storage::disk('public')->delete($bird->qr_image_path);
+                } catch (\Throwable $fe) {
+                    Log::warning('No se pudo eliminar el archivo QR', ['path' => $bird->qr_image_path, 'err' => $fe->getMessage()]);
+                }
+            }
+
+            $bird->delete();
+
+            $route = $this->isOwnerContext($request) ? 'owner.aves.index' : 'admin.aves.index';
+            return redirect()->route($route)->with('success', 'Ave eliminada correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error eliminando ave', ['id' => $bird->IDGallina, 'err' => $e->getMessage()]);
+            return back()->with('error', 'No se pudo eliminar el ave.');
+        }
+    }
+}

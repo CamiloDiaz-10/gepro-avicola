@@ -14,6 +14,11 @@ use Carbon\Carbon;
 
 class ProduccionHuevosController extends Controller
 {
+    private function isOwnerContext(Request $request): bool
+    {
+        $user = $request->user();
+        return ($request->routeIs('owner.*')) || ($user && $user->role && $user->role->NombreRol === 'Propietario');
+    }
     private function isEmployeeContext(Request $request): bool
     {
         $user = $request->user();
@@ -226,5 +231,31 @@ class ProduccionHuevosController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        try {
+            // Bloquear contexto de empleado explícitamente
+            if ($this->isEmployeeContext($request)) {
+                abort(403);
+            }
+
+            $record = ProduccionHuevos::findOrFail($id);
+
+            // Si es propietario, validar que el registro pertenezca a un lote permitido
+            if ($this->isOwnerContext($request)) {
+                $allowedLotIds = $this->permittedLotIds($request);
+                abort_unless($allowedLotIds->contains((int) $record->IDLote), 403);
+            }
+
+            $record->delete();
+
+            $redirect = $this->isOwnerContext($request) ? 'owner.produccion-huevos.index' : 'admin.produccion-huevos.index';
+            return redirect()->route($redirect)->with('success', 'Registro de producción eliminado correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error eliminando producción de huevos', ['id' => $id, 'err' => $e->getMessage()]);
+            return back()->with('error', 'No se pudo eliminar el registro.');
+        }
     }
 }

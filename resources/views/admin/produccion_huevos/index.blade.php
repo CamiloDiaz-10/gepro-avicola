@@ -122,6 +122,7 @@
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rotos</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Turno</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">% Rotos</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -133,6 +134,17 @@
                             <td class="px-4 py-2">{{ number_format($p->HuevosRotos ?? 0) }}</td>
                             <td class="px-4 py-2">{{ $p->Turno ?? '-' }}</td>
                             <td class="px-4 py-2">{{ $p->CantidadHuevos > 0 ? number_format(($p->HuevosRotos ?? 0) * 100 / $p->CantidadHuevos, 2) : '0.00' }}%</td>
+                            <td class="px-4 py-2">
+                                @if($area !== 'employee')
+                                    <form method="POST" action="{{ route($area.'.produccion-huevos.destroy', $p->IDProduccion) }}" onsubmit="return confirm('¿Eliminar registro de producción definitivamente?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-sm text-red-600 hover:text-red-800">Eliminar</button>
+                                    </form>
+                                @else
+                                    <span class="text-xs text-gray-400">Sin acciones</span>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

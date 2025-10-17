@@ -127,6 +127,7 @@ Route::middleware('auth')->group(function () {
         Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
         Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
         Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
+        Route::delete('produccion-huevos/{id}', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'destroy'])->name('produccion-huevos.destroy');
 
         // Gestión de Aves
         Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
@@ -136,6 +137,7 @@ Route::middleware('auth')->group(function () {
         Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
         Route::get('aves/scan', [\App\Http\Controllers\Admin\BirdsController::class, 'scan'])->name('aves.scan');
         Route::post('aves/qr/{token}/regenerate', [\App\Http\Controllers\Admin\BirdsController::class, 'regenerateByQr'])->name('aves.qr.regenerate');
+        Route::delete('aves/{bird}', [\App\Http\Controllers\Admin\BirdsController::class, 'destroy'])->name('aves.destroy');
 
         // Gestión de Alimentación
         Route::get('alimentacion', [\App\Http\Controllers\Admin\AlimentacionController::class, 'index'])->name('alimentacion.index');
@@ -159,6 +161,7 @@ Route::middleware('auth')->group(function () {
         Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
         Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
         Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
+        Route::delete('produccion-huevos/{id}', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'destroy'])->name('produccion-huevos.destroy');
 
         // Aves (Propietario) reutilizando controlador Admin
         Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
@@ -167,6 +170,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('aves/{bird}/estado', [\App\Http\Controllers\Admin\BirdsController::class, 'updateEstado'])->name('aves.estado.update');
         Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
         Route::get('aves/scan', [\App\Http\Controllers\Admin\BirdsController::class, 'scan'])->name('aves.scan');
+        Route::delete('aves/{bird}', [\App\Http\Controllers\Admin\BirdsController::class, 'destroy'])->name('aves.destroy');
 
         // Reportes (Propietario) reutilizando controlador Admin
         Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
