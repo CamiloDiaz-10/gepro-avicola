@@ -83,9 +83,9 @@
     <!-- Quick Actions -->
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <a href="{{ route('veterinario.alimentacion.index') }}" 
-               class="flex items-center p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors">
+               class="flex items-center p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors border border-transparent hover:border-blue-300 dark:hover:border-blue-700">
                 <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
                     <i class="fas fa-list text-white text-xl"></i>
                 </div>
@@ -96,13 +96,24 @@
             </a>
 
             <a href="{{ route('veterinario.alimentacion.create') }}" 
-               class="flex items-center p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors">
+               class="flex items-center p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors border border-transparent hover:border-green-300 dark:hover:border-green-700">
                 <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
                     <i class="fas fa-plus text-white text-xl"></i>
                 </div>
                 <div class="ml-4">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">Registrar Alimentación</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">Añadir nuevo registro</p>
+                </div>
+            </a>
+
+            <a href="{{ route('veterinario.aves.index') }}" 
+               class="flex items-center p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors border border-transparent hover:border-purple-300 dark:hover:border-purple-700">
+                <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                    <i class="fas fa-dove text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Ver Gestión de Aves</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Consulta información de aves</p>
                 </div>
             </a>
         </div>

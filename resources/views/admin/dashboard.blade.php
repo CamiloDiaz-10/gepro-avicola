@@ -6,11 +6,11 @@
 <div class="p-6">
     <div class="max-w-7xl mx-auto">
         <!-- Page Header -->
-        <div class="mb-8 bg-white rounded-lg shadow-lg p-6">
+        <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
                 <div>
-                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
-                    <p class="mt-2 text-sm lg:text-base text-gray-600">Panel de control completo del sistema de gestión avícola</p>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Dashboard Administrativo</h1>
+                    <p class="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-300">Panel de control completo del sistema de gestión avícola</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <a href="{{ route('admin.reports.index') }}" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-medium">
@@ -75,9 +75,9 @@
         <!-- Management Sections -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <!-- User Management -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Gestión de Usuarios</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Gestión de Usuarios</h3>
                     <a class="text-blue-600 hover:text-blue-800" href="{{ route('admin.users.index') }}" title="Ir a Gestión de Usuarios">
                         <i class="fas fa-cog"></i>
                     </a>
@@ -85,15 +85,15 @@
                 
                 <div class="space-y-3">
                     @foreach($statistics['users']['by_role'] as $role)
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span class="font-medium">{{ $role->role }}</span>
-                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">{{ $role->total }}</span>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                        <span class="font-medium dark:text-white">{{ $role->role }}</span>
+                        <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-1 rounded text-sm">{{ $role->total }}</span>
                     </div>
                     @endforeach
                 </div>
 
-                <div class="mt-4 pt-4 border-t">
-                    <div class="flex justify-between text-sm text-gray-600">
+                <div class="mt-4 pt-4 border-t dark:border-gray-700">
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-300">
                         <span>Usuarios Activos (30 días)</span>
                         <span class="font-semibold">{{ $statistics['users']['active_users'] }}</span>
                     </div>
@@ -107,9 +107,9 @@
             </div>
 
             <!-- Farm Management -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Gestión de Fincas</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Gestión de Fincas</h3>
                     <a class="text-green-600 hover:text-green-800" href="{{ route('admin.fincas.index') }}" title="Ir a Gestión de Fincas">
                         <i class="fas fa-cog"></i>
                     </a>
@@ -117,15 +117,15 @@
 
                 <div class="space-y-3">
                     @foreach($statistics['farms']['by_location'] as $location)
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span class="font-medium">{{ $location->Ubicacion }}</span>
-                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">{{ $location->total }}</span>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                        <span class="font-medium dark:text-white">{{ $location->Ubicacion }}</span>
+                        <span class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm">{{ $location->total }}</span>
                     </div>
                     @endforeach
                 </div>
 
-                <div class="mt-4 pt-4 border-t">
-                    <div class="flex justify-between text-sm text-gray-600">
+                <div class="mt-4 pt-4 border-t dark:border-gray-700">
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-300">
                         <span>Fincas con Lotes</span>
                         <span class="font-semibold">{{ $statistics['farms']['with_lots'] }}</span>
                     </div>
@@ -139,9 +139,9 @@
             </div>
 
             <!-- Bird Management -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Gestión de Aves</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Gestión de Aves</h3>
                     <a class="text-purple-600 hover:text-purple-800" href="{{ route('admin.lotes.index') }}" title="Ir a Gestión de Aves">
                         <i class="fas fa-cog"></i>
                     </a>
@@ -149,9 +149,9 @@
 
                 <div class="space-y-3">
                     @foreach($statistics['birds']['by_type'] as $type)
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span class="font-medium">{{ $type->type }}</span>
-                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">{{ $type->total }}</span>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                        <span class="font-medium dark:text-white">{{ $type->type }}</span>
+                        <span class="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-2 py-1 rounded text-sm">{{ $type->total }}</span>
                     </div>
                     @endforeach
                 </div>
@@ -167,19 +167,19 @@
         <!-- Production and Health Dashboard -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <!-- Production Chart -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Producción de Huevos (7 días)</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Producción de Huevos (7 días)</h3>
                 <div class="h-64">
                     <canvas id="productionChart"></canvas>
                 </div>
                 
                 <div class="mt-4">
-                    <h4 class="font-semibold mb-2">Producción por Turno Hoy</h4>
+                    <h4 class="font-semibold dark:text-white mb-2">Producción por Turno Hoy</h4>
                     <div class="grid grid-cols-3 gap-4">
                         @foreach($statistics['production']['by_quality'] as $quality)
-                        <div class="text-center p-2 bg-gray-50 rounded">
-                            <div class="font-semibold">{{ $quality->quality ?? 'Sin turno' }}</div>
-                            <div>{{ $quality->total }}</div>
+                        <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                            <div class="font-semibold dark:text-white">{{ $quality->quality ?? 'Sin turno' }}</div>
+                            <div class="dark:text-gray-300">{{ $quality->total }}</div>
                         </div>
                         @endforeach
                     </div>
@@ -187,32 +187,32 @@
             </div>
 
             <!-- Health Status -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Estado de Salud</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Estado de Salud</h3>
                 
                 <div class="space-y-4">
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                         <div class="flex items-center">
                             <i class="fas fa-heartbeat text-blue-600 mr-3"></i>
                             <div>
-                                <p class="font-semibold text-blue-800">Actividad Sanitaria</p>
-                                <p class="text-blue-600">{{ $statistics['overview']['pending_health_alerts'] }} tratamientos este mes</p>
+                                <p class="font-semibold text-blue-800 dark:text-blue-300">Actividad Sanitaria</p>
+                                <p class="text-blue-600 dark:text-blue-400">{{ $statistics['overview']['pending_health_alerts'] }} tratamientos este mes</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-2">
-                        <h4 class="font-medium text-gray-700">Tratamientos Recientes</h4>
+                        <h4 class="font-medium text-gray-700 dark:text-gray-200">Tratamientos Recientes</h4>
                         @foreach($statistics['health']['treatments'] as $treatment)
-                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <span class="text-sm">{{ $treatment->treatment }}</span>
-                            <span class="text-sm font-semibold">{{ $treatment->total }}</span>
+                        <div class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                            <span class="text-sm dark:text-gray-300">{{ $treatment->treatment }}</span>
+                            <span class="text-sm font-semibold dark:text-white">{{ $treatment->total }}</span>
                         </div>
                         @endforeach
                     </div>
 
-                    <div class="mt-4 pt-4 border-t">
-                        <div class="flex justify-between text-sm text-gray-600">
+                    <div class="mt-4 pt-4 border-t dark:border-gray-700">
+                        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-300">
                             <span>Costo Sanitario Estimado (30 días)</span>
                             <span class="font-semibold">${{ number_format($statistics['health']['estimated_cost_30d'] ?? 0) }}</span>
                         </div>
@@ -230,74 +230,74 @@
         <!-- Financial and Feeding Overview -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <!-- Financial Summary -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Resumen Financiero (30 días)</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resumen Financiero (30 días)</h3>
                 
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                    <div class="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                         <div>
-                            <p class="text-sm text-blue-600">Ingresos (estimados)</p>
-                            <p class="text-2xl font-bold text-blue-800">${{ number_format($statistics['financial']['revenue']) }}</p>
+                            <p class="text-sm text-blue-600 dark:text-blue-400">Ingresos (estimados)</p>
+                            <p class="text-2xl font-bold text-blue-800 dark:text-blue-300">${{ number_format($statistics['financial']['revenue']) }}</p>
                         </div>
                         <i class="fas fa-arrow-up text-blue-600 fa-2x"></i>
                     </div>
 
-                    <div class="flex justify-between items-center p-4 bg-yellow-50 rounded-lg">
+                    <div class="flex justify-between items-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                         <div>
-                            <p class="text-sm text-yellow-700">Gastos (estimados)</p>
-                            <p class="text-2xl font-bold text-yellow-800">${{ number_format($statistics['financial']['estimated_expenses_30d']) }}</p>
+                            <p class="text-sm text-yellow-700 dark:text-yellow-400">Gastos (estimados)</p>
+                            <p class="text-2xl font-bold text-yellow-800 dark:text-yellow-300">${{ number_format($statistics['financial']['estimated_expenses_30d']) }}</p>
                         </div>
                         <i class="fas fa-arrow-down text-yellow-600 fa-2x"></i>
                     </div>
 
-                    <div class="flex justify-between items-center p-4 bg-green-50 rounded-lg">
+                    <div class="flex justify-between items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                         <div>
-                            <p class="text-sm text-green-600">Neto (30 días)</p>
-                            <p class="text-2xl font-bold text-green-800">${{ number_format($statistics['financial']['estimated_net_30d']) }}</p>
+                            <p class="text-sm text-green-600 dark:text-green-400">Neto (30 días)</p>
+                            <p class="text-2xl font-bold text-green-800 dark:text-green-300">${{ number_format($statistics['financial']['estimated_net_30d']) }}</p>
                         </div>
                         <i class="fas fa-wallet text-green-600 fa-2x"></i>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="p-3 bg-gray-50 rounded">
-                            <p class="text-xs text-gray-500">Movimientos de Venta</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ number_format($statistics['financial']['sales']) }}</p>
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Movimientos de Venta</p>
+                            <p class="text-lg font-semibold text-gray-800 dark:text-white">{{ number_format($statistics['financial']['sales']) }}</p>
                         </div>
-                        <div class="p-3 bg-gray-50 rounded">
-                            <p class="text-xs text-gray-500">Movimientos de Compra</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ number_format($statistics['financial']['purchases']) }}</p>
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Movimientos de Compra</p>
+                            <p class="text-lg font-semibold text-gray-800 dark:text-white">{{ number_format($statistics['financial']['purchases']) }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Feeding Management -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Gestión de Alimentación</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Gestión de Alimentación</h3>
                 
                 <div class="space-y-4">
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                         <div class="flex items-center">
                             <i class="fas fa-exclamation-circle text-yellow-600 mr-3"></i>
                             <div>
-                                <p class="font-semibold text-yellow-800">Stock Bajo</p>
-                                <p class="text-yellow-600">{{ $statistics['overview']['low_stock_feeds'] }} tipos de alimento con stock bajo</p>
+                                <p class="font-semibold text-yellow-800 dark:text-yellow-300">Stock Bajo</p>
+                                <p class="text-yellow-600 dark:text-yellow-400">{{ $statistics['overview']['low_stock_feeds'] }} tipos de alimento con stock bajo</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-2">
-                        <h4 class="font-medium text-gray-700">Consumo por Tipo (30 días)</h4>
+                        <h4 class="font-medium text-gray-700 dark:text-gray-200">Consumo por Tipo (30 días)</h4>
                         @foreach($statistics['feeding']['by_feed_type'] as $feed)
-                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <span class="text-sm">{{ $feed->feed_type }}</span>
-                            <span class="text-sm font-semibold">{{ number_format($feed->total) }} kg</span>
+                        <div class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                            <span class="text-sm dark:text-gray-300">{{ $feed->feed_type }}</span>
+                            <span class="text-sm font-semibold dark:text-white">{{ number_format($feed->total) }} kg</span>
                         </div>
                         @endforeach
                     </div>
 
-                    <div class="mt-4 pt-4 border-t space-y-2">
-                        <div class="flex justify-between text-sm text-gray-600">
+                    <div class="mt-4 pt-4 border-t dark:border-gray-700 space-y-2">
+                        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-300">
                             <span>Costo Alimentación (7 días)</span>
                             <span class="font-semibold">${{ number_format($statistics['feeding']['estimated_costs']['total_cost_7d'] ?? 0) }}</span>
                         </div>
@@ -305,7 +305,7 @@
                             <span>Costo Alimentación (30 días)</span>
                             <span class="font-semibold">${{ number_format($statistics['feeding']['estimated_costs']['total_cost_30d'] ?? 0) }}</span>
                         </div>
-                        <div class="flex justify-between text-xs text-gray-500">
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                             <span>Precio por kg (config)</span>
                             <span>${{ number_format($statistics['feeding']['estimated_costs']['price_per_kg'] ?? 0) }}</span>
                         </div>
@@ -321,23 +321,23 @@
         </div>
 
         <!-- Recent Activities -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Actividades Recientes</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Actividades Recientes</h3>
             
             <div class="space-y-3">
                 @foreach($statistics['recent_activities'] as $activity)
-                <div class="flex items-center p-3 border border-gray-200 rounded-lg">
+                <div class="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
                     @if($activity->type == 'user_registration')
                         <i class="fas fa-user-plus text-blue-600 mr-3"></i>
                         <div class="flex-1">
-                            <p class="text-sm font-medium">Nuevo usuario registrado: {{ $activity->Nombre }} {{ $activity->Apellido }}</p>
-                            <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}</p>
+                            <p class="text-sm font-medium dark:text-white">Nuevo usuario registrado: {{ $activity->Nombre }} {{ $activity->Apellido }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}</p>
                         </div>
                     @elseif($activity->type == 'lot_movement')
                         <i class="fas fa-exchange-alt text-green-600 mr-3"></i>
                         <div class="flex-1">
-                            <p class="text-sm font-medium">{{ $activity->TipoMovimiento }} en lote: {{ $activity->Nombre }}</p>
-                            <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}</p>
+                            <p class="text-sm font-medium dark:text-white">{{ $activity->TipoMovimiento }} en lote: {{ $activity->Nombre }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}</p>
                         </div>
                     @endif
                 </div>
@@ -345,7 +345,7 @@
             </div>
 
             @if(empty($statistics['recent_activities']))
-            <div class="text-center py-8 text-gray-500">
+            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                 <i class="fas fa-inbox fa-3x mb-4"></i>
                 <p>No hay actividades recientes</p>
             </div>
@@ -354,22 +354,22 @@
 
         <!-- Quick Actions -->
         <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{{ route('admin.users.index') }}" class="bg-white hover:bg-gray-50 border-2 border-blue-200 text-blue-700 p-4 rounded-lg transition-colors text-center block">
+            <a href="{{ route('admin.users.index') }}" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400 p-4 rounded-lg transition-colors text-center block">
                 <i class="fas fa-users fa-2x mb-2"></i>
                 <p class="font-semibold">Gestionar Usuarios</p>
             </a>
             
-            <a href="{{ route('admin.fincas.index') }}" class="bg-white hover:bg-gray-50 border-2 border-green-200 text-green-700 p-4 rounded-lg transition-colors text-center block">
+            <a href="{{ route('admin.fincas.index') }}" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 p-4 rounded-lg transition-colors text-center block">
                 <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
                 <p class="font-semibold">Gestionar Fincas</p>
             </a>
             
-            <a href="{{ route('admin.lotes.index') }}" class="bg-white hover:bg-gray-50 border-2 border-purple-200 text-purple-700 p-4 rounded-lg transition-colors text-center block">
+            <a href="{{ route('admin.lotes.index') }}" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-400 p-4 rounded-lg transition-colors text-center block">
                 <i class="fas fa-feather fa-2x mb-2"></i>
                 <p class="font-semibold">Gestionar Lotes</p>
             </a>
             
-            <a href="{{ route('admin.reports.index') }}" class="bg-white hover:bg-gray-50 border-2 border-red-200 text-red-700 p-4 rounded-lg transition-colors text-center block">
+            <a href="{{ route('admin.reports.index') }}" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-lg transition-colors text-center block">
                 <i class="fas fa-chart-bar fa-2x mb-2"></i>
                 <p class="font-semibold">Ver Reportes</p>
             </a>
