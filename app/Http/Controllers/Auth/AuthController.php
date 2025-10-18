@@ -101,6 +101,7 @@ class AuthController extends Controller
                 'Administrador' => '/admin/dashboard',
                 'Propietario' => '/owner/dashboard',
                 'Empleado' => '/employee/dashboard',
+                'Veterinario' => '/veterinario/dashboard',
                 default => '/dashboard'
             };
 

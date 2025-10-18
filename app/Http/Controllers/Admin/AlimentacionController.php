@@ -95,7 +95,15 @@ class AlimentacionController extends Controller
             $data['Fecha'] = $data['Fecha'] ?? Carbon::now()->toDateString();
             $data['IDUsuario'] = auth()->id();
             Alimentacion::create($data);
-            return redirect()->route('admin.alimentacion.index')->with('success','Registro de alimentación guardado correctamente.');
+            
+            // Determinar la ruta de redirección según el rol del usuario
+            $rol = auth()->user()->role ? auth()->user()->role->NombreRol : null;
+            $redirectRoute = match ($rol) {
+                'Veterinario' => 'veterinario.alimentacion.index',
+                default => 'admin.alimentacion.index'
+            };
+            
+            return redirect()->route($redirectRoute)->with('success','Registro de alimentación guardado correctamente.');
         } catch (\Throwable $e) {
             Log::error('Error guardando alimentación', ['message' => $e->getMessage()]);
             return back()->withInput()->with('error','Ocurrió un error al guardar.');

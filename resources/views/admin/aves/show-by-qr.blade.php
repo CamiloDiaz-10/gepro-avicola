@@ -6,22 +6,26 @@
 <div class="p-6">
     <div class="max-w-4xl mx-auto space-y-6">
         @if(session('success'))
-            <div class="p-3 rounded bg-green-100 text-green-700">{{ session('success') }}</div>
+            <div class="p-3 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">{{ session('success') }}</div>
         @endif
         @if(session('error'))
-            <div class="p-3 rounded bg-red-100 text-red-700">{{ session('error') }}</div>
+            <div class="p-3 rounded bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">{{ session('error') }}</div>
         @endif
         <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-gray-800">Detalle del Ave</h1>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Detalle del Ave</h1>
             <div class="flex gap-2">
                 @php
-                    $isAdmin = auth()->check() && optional(auth()->user()->role)->NombreRol === 'Administrador';
-                    $isOwner = auth()->check() && optional(auth()->user()->role)->NombreRol === 'Propietario';
+                    $role = auth()->check() ? optional(auth()->user()->role)->NombreRol : null;
+                    $isAdmin = $role === 'Administrador';
+                    $isOwner = $role === 'Propietario';
+                    $isVeterinario = $role === 'Veterinario';
                 @endphp
                 @if($isAdmin)
-                    <a href="{{ route('admin.aves.index') }}" class="px-3 py-2 text-sm rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">Volver</a>
+                    <a href="{{ route('admin.aves.index') }}" class="px-3 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-500">Volver</a>
+                @elseif($isVeterinario)
+                    <a href="{{ route('veterinario.aves.index') }}" class="px-3 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-500">Volver</a>
                 @else
-                    <button type="button" id="btnBackSafe" class="px-3 py-2 text-sm rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">Volver</button>
+                    <button type="button" id="btnBackSafe" class="px-3 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-500">Volver</button>
                 @endif
                 @if($isAdmin || $isOwner)
                     <a href="#editar-estado" class="px-3 py-2 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-700">Editar estado</a>
@@ -30,48 +34,48 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-2 bg-white shadow rounded-lg p-6 space-y-4">
+            <div class="md:col-span-2 bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <div class="text-xs text-gray-500">ID</div>
-                        <div class="font-semibold">{{ $bird->IDGallina }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">ID</div>
+                        <div class="font-semibold dark:text-white">{{ $bird->IDGallina }}</div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500">Estado</div>
-                        <div class="font-semibold">{{ $bird->Estado }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Estado</div>
+                        <div class="font-semibold dark:text-white">{{ $bird->Estado }}</div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500">Lote</div>
-                        <div class="font-semibold">{{ $bird->lote->Nombre ?? '-' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Lote</div>
+                        <div class="font-semibold dark:text-white">{{ $bird->lote->Nombre ?? '-' }}</div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500">Tipo</div>
-                        <div class="font-semibold">{{ $bird->tipoGallina->Nombre ?? '-' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Tipo</div>
+                        <div class="font-semibold dark:text-white">{{ $bird->tipoGallina->Nombre ?? '-' }}</div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500">Nacimiento</div>
-                        <div class="font-semibold">{{ $bird->FechaNacimiento ? \Carbon\Carbon::parse($bird->FechaNacimiento)->format('d/m/Y') : '-' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Nacimiento</div>
+                        <div class="font-semibold dark:text-white">{{ $bird->FechaNacimiento ? \Carbon\Carbon::parse($bird->FechaNacimiento)->format('d/m/Y') : '-' }}</div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500">Peso (g)</div>
-                        <div class="font-semibold">{{ $bird->Peso ?? '-' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Peso (g)</div>
+                        <div class="font-semibold dark:text-white">{{ $bird->Peso ?? '-' }}</div>
                     </div>
                 </div>
                 @auth
                     @php
-                        $role = optional(auth()->user()->role)->NombreRol;
-                        $canEdit = in_array($role, ['Administrador','Propietario']);
-                        $updateRouteName = $role === 'Propietario' ? 'owner.aves.estado.update' : 'admin.aves.estado.update';
+                        $roleAuth = optional(auth()->user()->role)->NombreRol;
+                        $canEdit = in_array($roleAuth, ['Administrador','Propietario']);
+                        $updateRouteName = $roleAuth === 'Propietario' ? 'owner.aves.estado.update' : 'admin.aves.estado.update';
                     @endphp
                     @if($canEdit)
-                        <div id="editar-estado" class="pt-4 border-t">
-                            <h3 class="text-sm font-semibold text-gray-700 mb-2">Actualizar Estado</h3>
+                        <div id="editar-estado" class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Actualizar Estado</h3>
                             <form method="POST" action="{{ route($updateRouteName, $bird->IDGallina) }}" class="flex items-end gap-3">
                                 @csrf
                                 @method('PATCH')
                                 <div>
-                                    <label class="block text-xs text-gray-500 mb-1">Estado</label>
-                                    <select name="Estado" class="rounded-md border-gray-300">
+                                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Estado</label>
+                                    <select name="Estado" class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                         @foreach(['Activa','Muerta','Vendida'] as $estado)
                                             <option value="{{ $estado }}" {{ $bird->Estado === $estado ? 'selected' : '' }}>{{ $estado }}</option>
                                         @endforeach
@@ -84,17 +88,17 @@
                 @endauth
                 @if(!empty($bird->UrlImagen))
                     <div class="pt-4">
-                        <div class="text-xs text-gray-500 mb-1">Foto del Ave</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Foto del Ave</div>
                         <img src="{{ asset('storage/'.$bird->UrlImagen) }}" alt="Foto del ave" class="rounded border max-h-72 object-contain">
-                        <div class="text-xs text-gray-500 mt-1">Archivo: {{ $bird->UrlImagen }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Archivo: {{ $bird->UrlImagen }}</div>
                     </div>
                 @endif
             </div>
-            <div class="bg-white shadow rounded-lg p-6 space-y-3">
-                <div class="text-sm text-gray-600">Código QR</div>
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-3">
+                <div class="text-sm text-gray-600 dark:text-gray-300">Código QR</div>
                 @if(!empty($bird->qr_image_path))
                     <img src="{{ asset('storage/'.$bird->qr_image_path) }}" alt="QR del ave" class="mx-auto rounded border">
-                    <div class="flex items-center justify-between text-xs text-gray-500">
+                    <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                         <span class="break-all">Token: {{ $bird->qr_token }}</span>
                     </div>
                     <a href="{{ asset('storage/'.$bird->qr_image_path) }}" download class="block text-center px-3 py-2 text-sm rounded-md bg-green-600 text-white hover:bg-green-700">Descargar (SVG)</a>
@@ -110,7 +114,7 @@
                     @endauth
                 @else
                     <div id="qr-container" class="flex items-center justify-center p-2 border rounded"></div>
-                    <div class="text-xs text-gray-500 break-all">Token: {{ $bird->qr_token }}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 break-all">Token: {{ $bird->qr_token }}</div>
                     <a id="downloadLink" download="ave_{{ $bird->IDGallina }}_qr.png" class="block text-center px-3 py-2 text-sm rounded-md bg-green-600 text-white hover:bg-green-700">Descargar PNG</a>
                     @auth
                         @if(optional(auth()->user()->role)->NombreRol === 'Administrador')

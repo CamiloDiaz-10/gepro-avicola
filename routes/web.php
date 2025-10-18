@@ -93,6 +93,10 @@ Route::middleware('auth')->group(function () {
         return view('dashboard.employee', ['statistics' => app(\App\Services\DashboardService::class)->getStatistics()]);
     })->name('employee.dashboard')->middleware('role:Empleado');
     
+    Route::get('/veterinario/dashboard', function () {
+        return view('dashboard.veterinario', ['statistics' => app(\App\Services\DashboardService::class)->getStatistics()]);
+    })->name('veterinario.dashboard')->middleware('role:Veterinario');
+    
     // Rutas de perfil de usuario
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
@@ -191,5 +195,19 @@ Route::middleware('auth')->group(function () {
         // Fincas asignadas (Empleado) reutilizando controlador Admin
         Route::get('fincas', [\App\Http\Controllers\Admin\FincaController::class, 'index'])->name('fincas.index');
         Route::get('fincas/{finca}', [\App\Http\Controllers\Admin\FincaController::class, 'show'])->name('fincas.show');
+    });
+    
+    // Rutas específicas para veterinarios
+    Route::middleware(['role:Veterinario'])->prefix('veterinario')->name('veterinario.')->group(function () {
+        // Gestión de Alimentación (Veterinario)
+        Route::get('alimentacion', [\App\Http\Controllers\Admin\AlimentacionController::class, 'index'])->name('alimentacion.index');
+        Route::get('alimentacion/create', [\App\Http\Controllers\Admin\AlimentacionController::class, 'create'])->name('alimentacion.create');
+        Route::post('alimentacion', [\App\Http\Controllers\Admin\AlimentacionController::class, 'store'])->name('alimentacion.store');
+        Route::get('alimentacion/export/csv', [\App\Http\Controllers\Admin\AlimentacionController::class, 'exportCsv'])->name('alimentacion.export.csv');
+        
+        // Gestión de Aves (Veterinario - Solo lectura)
+        Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
+        Route::get('aves/qr/{token}', [\App\Http\Controllers\Admin\BirdsController::class, 'showByQr'])->name('aves.show.byqr');
+        Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
     });
 });

@@ -3,11 +3,11 @@
 @section('content')
 <div class="p-6">
     <div class="max-w-7xl mx-auto space-y-6">
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Reportes Avanzados</h1>
-                    <p class="text-gray-600">Analiza producción, alimentación, sanidad y finanzas</p>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Reportes Avanzados</h1>
+                    <p class="text-gray-600 dark:text-gray-300">Analiza producción, alimentación, sanidad y finanzas</p>
                 </div>
                 <div class="grid grid-cols-2 lg:flex lg:flex-wrap gap-2">
                     <a href="{{ route('admin.reports.export.production', request()->query()) }}" class="inline-flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium">
@@ -38,15 +38,15 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div class="mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">Filtros de Análisis</h2>
-                <p class="text-gray-500 text-sm">Selecciona el rango de fechas y la finca para analizar</p>
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Filtros de Análisis</h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Selecciona el rango de fechas y la finca para analizar</p>
             </div>
             <form method="GET" action="{{ route('admin.reports.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Finca</label>
-                    <select name="finca" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Finca</label>
+                    <select name="finca" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="">Todas las fincas</option>
                         @foreach($fincas as $f)
                             <option value="{{ $f->IDFinca }}" {{ (string)request('finca') === (string)$f->IDFinca ? 'selected' : '' }}>
@@ -56,19 +56,19 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Desde</label>
-                    <input type="date" name="desde" value="{{ request('desde') }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Fecha Desde</label>
+                    <input type="date" name="desde" value="{{ request('desde') }}" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Hasta</label>
-                    <input type="date" name="hasta" value="{{ request('hasta') }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Fecha Hasta</label>
+                    <input type="date" name="hasta" value="{{ request('hasta') }}" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
                 <div class="flex items-end gap-2">
                     <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
                         Aplicar
                     </button>
                     @if(request('finca') || request('desde') || request('hasta'))
-                        <a href="{{ route('admin.reports.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                        <a href="{{ route('admin.reports.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
@@ -80,56 +80,56 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Producción -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Producción (diaria)</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Producción (diaria)</h2>
                 </div>
                 <div class="h-64"><canvas id="chartProduction"></canvas></div>
                 <div class="mt-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Top 10 Lotes por Producción</h3>
-                    <ul class="text-sm text-gray-700 space-y-1 max-h-40 overflow-auto pr-1">
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Top 10 Lotes por Producción</h3>
+                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1 max-h-40 overflow-auto pr-1">
                         @foreach($production['by_lot'] as $row)
                             <li class="flex justify-between"><span>{{ $row->lote }}</span><span class="font-semibold">{{ $row->total }}</span></li>
                         @endforeach
                         @if($production['by_lot']->isEmpty())
-                            <li class="text-gray-500">Sin datos</li>
+                            <li class="text-gray-500 dark:text-gray-400">Sin datos</li>
                         @endif
                     </ul>
                 </div>
             </div>
 
             <!-- Alimentación -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Alimentación</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Alimentación</h2>
                 </div>
                 <div class="h-64"><canvas id="chartFeeding"></canvas></div>
             </div>
 
             <!-- Salud -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Salud (Tratamientos)</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Salud (Tratamientos)</h2>
                 </div>
                 <div class="h-64"><canvas id="chartHealth"></canvas></div>
                 <div class="mt-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Recientes</h3>
-                    <ul class="text-sm text-gray-700 space-y-1 max-h-40 overflow-auto pr-1">
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Recientes</h3>
+                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1 max-h-40 overflow-auto pr-1">
                         @foreach($health['recent'] as $r)
-                            <li class="flex justify-between"><span>{{ $r->lote }} - {{ $r->TipoTratamiento }}</span><span class="text-gray-500">{{ \Carbon\Carbon::parse($r->Fecha)->format('d/m/Y') }}</span></li>
+                            <li class="flex justify-between"><span>{{ $r->lote }} - {{ $r->TipoTratamiento }}</span><span class="text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($r->Fecha)->format('d/m/Y') }}</span></li>
                         @endforeach
                         @if($health['recent']->isEmpty())
-                            <li class="text-gray-500">Sin datos</li>
+                            <li class="text-gray-500 dark:text-gray-400">Sin datos</li>
                         @endif
                     </ul>
                 </div>
             </div>
 
             <!-- Finanzas -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Finanzas (Movimientos)</h2>
-                    <div class="text-sm text-gray-700">Ventas: <span class="font-semibold">{{ $finance['totals']['ventas'] }}</span> · Compras: <span class="font-semibold">{{ $finance['totals']['compras'] }}</span></div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Finanzas (Movimientos)</h2>
+                    <div class="text-sm text-gray-700 dark:text-gray-300">Ventas: <span class="font-semibold">{{ $finance['totals']['ventas'] }}</span> · Compras: <span class="font-semibold">{{ $finance['totals']['compras'] }}</span></div>
                 </div>
                 <div class="h-64"><canvas id="chartFinance"></canvas></div>
             </div>

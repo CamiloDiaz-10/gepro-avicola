@@ -42,6 +42,10 @@
                                 $dashboardRoute = 'employee.dashboard';
                                 $isActive = request()->routeIs('employee.dashboard');
                                 break;
+                            case 'Veterinario':
+                                $dashboardRoute = 'veterinario.dashboard';
+                                $isActive = request()->routeIs('veterinario.dashboard');
+                                break;
                             default:
                                 $isActive = request()->routeIs('dashboard');
                         }
@@ -63,7 +67,7 @@
             <!-- Opciones específicas para Administradores -->
             @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Administrador')
             <li>
-                <div class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                <div class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Administración
                 </div>
@@ -208,7 +212,7 @@
             <!-- Opciones específicas para Propietarios -->
             @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Propietario')
             <li>
-                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Producción
                 </div>
@@ -240,7 +244,7 @@
 
             <!-- Owner: Aves -->
             <li>
-                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Aves
                 </div>
@@ -272,7 +276,7 @@
 
             <!-- Owner: Reportes -->
             <li>
-                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Reportes
                 </div>
@@ -294,7 +298,7 @@
             <!-- Opciones específicas para Empleados -->
             @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Empleado')
             <li>
-                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Producción
                 </div>
@@ -325,7 +329,7 @@
             </li>
 
             <li>
-                <div class="px-3 py-2 text-xs font-semibold text-blue-300 uppercase tracking-wider"
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Fincas
                 </div>
@@ -346,6 +350,59 @@
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                         {{ $empFarmsCount }}
                     </span>
+                </a>
+            </li>
+            @endif
+
+            <!-- Opciones específicas para Veterinarios -->
+            @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Veterinario')
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Alimentación
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('veterinario.alimentacion.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('veterinario.alimentacion.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-drumstick-bite text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Gestión de Alimentación
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestión de Alimentación</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('veterinario.alimentacion.create') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('veterinario.alimentacion.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Alimentación
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Alimentación</span>
+                </a>
+            </li>
+
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Aves
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('veterinario.aves.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('veterinario.aves.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-dove text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Gestión de Aves
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestión de Aves</span>
                 </a>
             </li>
             @endif
