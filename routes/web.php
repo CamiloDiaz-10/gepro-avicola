@@ -142,6 +142,9 @@ Route::middleware('auth')->group(function () {
         Route::get('aves/scan', [\App\Http\Controllers\Admin\BirdsController::class, 'scan'])->name('aves.scan');
         Route::post('aves/qr/{token}/regenerate', [\App\Http\Controllers\Admin\BirdsController::class, 'regenerateByQr'])->name('aves.qr.regenerate');
         Route::delete('aves/{bird}', [\App\Http\Controllers\Admin\BirdsController::class, 'destroy'])->name('aves.destroy');
+        
+        // Galería de imágenes de aves
+        Route::get('aves/galeria', [\App\Http\Controllers\Admin\BirdsController::class, 'gallery'])->name('aves.gallery');
 
         // Gestión de Alimentación
         Route::get('alimentacion', [\App\Http\Controllers\Admin\AlimentacionController::class, 'index'])->name('alimentacion.index');

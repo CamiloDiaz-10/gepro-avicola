@@ -138,6 +138,20 @@
                 </a>
             </li>
 
+            <!-- Galería de Aves -->
+            <li>
+                <a href="{{ route('admin.aves.gallery') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.aves.gallery') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-images text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Galería de Aves
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Galería de Aves</span>
+                </a>
+            </li>
+
             <!-- Gestión de Alimentación (Admin) -->
             <li>
                 <a href="{{ route('admin.alimentacion.index') }}" 

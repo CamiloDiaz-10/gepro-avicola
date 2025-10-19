@@ -23,6 +23,24 @@ class BirdsController extends Controller
         return ($request->routeIs('owner.*')) || ($user && $user->role && $user->role->NombreRol === 'Propietario');
     }
 
+    /**
+     * Display a gallery of bird images
+     *
+     * @return \Illuminate\View\View
+     */
+    public function gallery()
+    {
+        $birds = Bird::whereNotNull('UrlImagen')
+            ->where('UrlImagen', '!=', '')
+            ->orderBy('IDLote')
+            ->paginate(20); // Show 20 birds per page
+
+        return view('admin.birds.gallery', [
+            'birds' => $birds,
+            'isOwnerContext' => $this->isOwnerContext(request())
+        ]);
+    }
+
     private function permittedLotIds(Request $request)
     {
         $user = $request->user();
