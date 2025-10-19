@@ -289,6 +289,9 @@ class BirdsController extends Controller
                 abort_unless($permittedLots->contains((int) $bird->IDLote), 403);
             }
 
+            // Guardar el ID del lote antes de eliminar
+            $loteId = $bird->IDLote;
+
             // Eliminar imagen de QR si existe
             if (!empty($bird->qr_image_path)) {
                 try {
@@ -298,7 +301,22 @@ class BirdsController extends Controller
                 }
             }
 
+            // Eliminar imagen si existe
+            if (!empty($bird->UrlImagen)) {
+                try {
+                    Storage::disk('public')->delete($bird->UrlImagen);
+                } catch (\Throwable $fe) {
+                    Log::warning('No se pudo eliminar la imagen del ave', ['path' => $bird->UrlImagen, 'err' => $fe->getMessage()]);
+                }
+            }
+
             $bird->delete();
+
+            // Si viene del referer de lotes, redirigir al lote
+            $referer = $request->headers->get('referer');
+            if ($referer && str_contains($referer, '/lotes/')) {
+                return redirect()->route('admin.lotes.show', $loteId)->with('success', 'Ave eliminada correctamente del lote.');
+            }
 
             $route = $this->isOwnerContext($request) ? 'owner.aves.index' : 'admin.aves.index';
             return redirect()->route($route)->with('success', 'Ave eliminada correctamente.');

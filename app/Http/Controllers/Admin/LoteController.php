@@ -64,8 +64,126 @@ class LoteController extends Controller
     // Ver
     public function show(Lote $lote)
     {
-        $lote->load('finca');
-        return view('admin.lotes.show', compact('lote'));
+        // Cargar relaciones necesarias
+        $lote->load(['finca', 'gallinas.tipoGallina']);
+        
+        // Obtener conteos directos desde la base de datos
+        $conteos = \DB::table('gallinas')
+            ->select(
+                \DB::raw('COUNT(*) as total'),
+                \DB::raw('SUM(CASE WHEN LOWER(TRIM(Estado)) = "activa" OR LOWER(TRIM(Estado)) = "activo" THEN 1 ELSE 0 END) as activas'),
+                \DB::raw('SUM(CASE WHEN LOWER(TRIM(Estado)) = "muerta" OR LOWER(TRIM(Estado)) = "muerto" THEN 1 ELSE 0 END) as inactivas'),
+                \DB::raw('SUM(CASE WHEN LOWER(TRIM(Estado)) LIKE "%vendida%" OR LOWER(TRIM(Estado)) LIKE "%vendido%" THEN 1 ELSE 0 END) as vendidas')
+            )
+            ->where('IDLote', $lote->IDLote)
+            ->first();
+        
+        // Si no hay resultados, inicializar con ceros
+        $totalGallinas = $conteos->total ?? 0;
+        $gallinasActivas = $conteos->activas ?? 0;
+        $gallinasInactivas = $conteos->inactivas ?? 0;
+        $gallinasVendidas = $conteos->vendidas ?? 0;
+        
+        // Calcular aves realmente activas (total - inactivas - vendidas)
+        $gallinasActivas = $totalGallinas - $gallinasInactivas - $gallinasVendidas;
+        
+        // Estadísticas por tipo de gallina
+        $porTipo = $lote->gallinas->groupBy('IDTipoGallina')->map(function($grupo) {
+            return [
+                'tipo' => $grupo->first()->tipoGallina->Nombre ?? 'Sin tipo',
+                'cantidad' => $grupo->count(),
+                'porcentaje' => round(($grupo->count() / $grupo->sum(function() { return 1; })) * 100, 1)
+            ];
+        })->sortByDesc('cantidad');
+        
+        // Registrar para depuración
+        \Log::info('Estadísticas del lote ' . $lote->IDLote . ' (SQL):', [
+            'total' => $totalGallinas,
+            'activas' => $gallinasActivas,
+            'inactivas' => $gallinasInactivas,
+            'vendidas' => $gallinasVendidas,
+            'query' => 'SELECT IDLote, COUNT(*) as total, ' .
+                      'SUM(CASE WHEN LOWER(TRIM(Estado)) = "activa" OR LOWER(TRIM(Estado)) = "activo" THEN 1 ELSE 0 END) as activas, ' .
+                      'SUM(CASE WHEN LOWER(TRIM(Estado)) = "muerta" OR LOWER(TRIM(Estado)) = "muerto" THEN 1 ELSE 0 END) as inactivas, ' .
+                      'SUM(CASE WHEN LOWER(TRIM(Estado)) LIKE "%vendida%" OR LOWER(TRIM(Estado)) LIKE "%vendido%" THEN 1 ELSE 0 END) as vendidas ' .
+                      'FROM gallinas WHERE IDLote = ' . $lote->IDLote
+        ]);
+        
+        // Pasar las variables a la vista
+        return view('admin.lotes.show', compact(
+            'lote', 
+            'totalGallinas', 
+            'gallinasActivas', 
+            'gallinasInactivas',
+            'gallinasVendidas',
+            'porTipo'
+        ));
+        $distribucionEdad = $lote->gallinas->groupBy(function($gallina) {
+            $semanas = $gallina->edad_en_semanas;
+            if ($semanas < 4) return '0-3 semanas';
+            if ($semanas < 12) return '4-11 semanas';
+            if ($semanas < 24) return '3-5 meses';
+            if ($semanas < 52) return '6-12 meses';
+            return 'Más de 1 año';
+        })->map(function($grupo, $rango) {
+            return [
+                'rango' => $rango,
+                'cantidad' => $grupo->count(),
+                'porcentaje' => round(($grupo->count() / $grupo->sum(function() { return 1; })) * 100, 1)
+            ];
+        })->sortBy('rango');
+        
+        // Peso promedio
+        $pesoPromedio = $lote->gallinas->avg('Peso');
+        
+        // Tendencias de producción (últimos 7 días)
+        $fechas = collect(range(6, 0))->map(function($dias) {
+            return now()->subDays($dias)->format('Y-m-d');
+        });
+        
+        $tendencias = [];
+        foreach ($fechas as $fecha) {
+            $tendencias[$fecha] = [
+                'fecha' => $fecha,
+                'total' => 0,
+                'activas' => 0,
+                'inactivas' => 0
+            ];
+        }
+        
+        // Agrupar por fecha de creación
+        $lote->gallinas->each(function($gallina) use (&$tendencias) {
+            $fecha = $gallina->created_at->format('Y-m-d');
+            if (isset($tendencias[$fecha])) {
+                $tendencias[$fecha]['total']++;
+                if ($gallina->Estado === 'Activa') {
+                    $tendencias[$fecha]['activas']++;
+                } else {
+                    $tendencias[$fecha]['inactivas']++;
+                }
+            }
+        });
+        
+        // Mortalidad vs. cantidad inicial
+        $mortalidad = [
+            'inicial' => $lote->CantidadInicial,
+            'actual' => $totalGallinas,
+            'diferencia' => $lote->CantidadInicial - $totalGallinas,
+            'porcentaje_mortalidad' => $lote->CantidadInicial > 0 ? 
+                round((($lote->CantidadInicial - $totalGallinas) / $lote->CantidadInicial) * 100, 2) : 0
+        ];
+        
+        return view('admin.lotes.show', compact(
+            'lote', 
+            'totalGallinas', 
+            'gallinasActivas', 
+            'gallinasInactivas',
+            'porTipo',
+            'distribucionEdad',
+            'pesoPromedio',
+            'tendencias',
+            'mortalidad'
+        ));
     }
 
     // Form editar
