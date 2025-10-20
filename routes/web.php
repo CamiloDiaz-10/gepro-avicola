@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\LoteController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SanidadController;
 use App\Http\Controllers\Admin\BirdsController;
+use App\Http\Controllers\Api\LoteApiController;
 // Controladores comentados hasta crearlos:
 // use App\Http\Controllers\UserController;
 // use App\Http\Controllers\RoleController;
@@ -31,6 +32,12 @@ Route::view('/offline', 'offline')->name('offline');
 
 // Vista de QR de aves (PÚBLICA) para permitir escaneo sin autenticación
 Route::get('/admin/aves/qr/{token}', [BirdsController::class, 'showByQr'])->name('admin.aves.show.byqr');
+
+// Rutas API (protegidas con autenticación)
+Route::middleware('auth')->prefix('api')->group(function () {
+    Route::get('/lotes/{lote}/produccion-info', [LoteApiController::class, 'getProduccionInfo'])->name('api.lotes.produccion-info');
+    Route::post('/lotes/validar-cantidad', [LoteApiController::class, 'validarCantidad'])->name('api.lotes.validar-cantidad');
+});
 
 // Rutas de autenticación
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');

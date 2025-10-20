@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Lote;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class StoreProduccionHuevosRequest extends FormRequest
 {
@@ -36,5 +38,32 @@ class StoreProduccionHuevosRequest extends FormRequest
             'Fecha.before_or_equal' => 'La fecha no puede ser futura.',
             'Turno.in' => 'El turno debe ser Mañana, Tarde o Noche.',
         ];
+    }
+
+    /**
+     * Configure el validador para agregar validación personalizada
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function ($validator) {
+            if (!$validator->errors()->has('IDLote') && !$validator->errors()->has('CantidadHuevos')) {
+                $loteId = $this->input('IDLote');
+                $cantidadHuevos = $this->input('CantidadHuevos');
+
+                try {
+                    $lote = Lote::find($loteId);
+                    
+                    if ($lote) {
+                        $validacion = $lote->validarCantidadHuevos($cantidadHuevos);
+                        
+                        if (!$validacion['valido']) {
+                            $validator->errors()->add('CantidadHuevos', $validacion['mensaje']);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // Si hay error, no agregamos validación adicional
+                }
+            }
+        });
     }
 }
