@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HasFincaScope;
 
 class ProduccionHuevos extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFincaScope;
 
     protected $table = 'produccion_huevos';
     protected $primaryKey = 'IDProduccion';
@@ -21,7 +22,6 @@ class ProduccionHuevos extends Model
         'HuevosRotos',
         'Turno',
         'PesoPromedio',
-        'PorcentajePostura',
         'Observaciones'
     ];
 
@@ -29,8 +29,7 @@ class ProduccionHuevos extends Model
         'Fecha' => 'date',
         'CantidadHuevos' => 'integer',
         'HuevosRotos' => 'integer',
-        'PesoPromedio' => 'decimal:2',
-        'PorcentajePostura' => 'decimal:2'
+        'PesoPromedio' => 'decimal:2'
     ];
 
     // Relationships

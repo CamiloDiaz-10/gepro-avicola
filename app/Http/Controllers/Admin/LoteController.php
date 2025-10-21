@@ -5,14 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Lote;
 use App\Models\Finca;
+use App\Traits\FiltroFincasHelper;
 use Illuminate\Http\Request;
 
 class LoteController extends Controller
 {
+    use FiltroFincasHelper;
+
     // Listado de lotes
     public function index(Request $request)
     {
         $query = Lote::with('finca');
+
+        // Aplicar filtro de fincas según usuario
+        $query = $this->aplicarFiltroFincas($query);
 
         if ($request->filled('finca')) {
             $query->where('IDFinca', $request->integer('finca'));
@@ -26,7 +32,9 @@ class LoteController extends Controller
         }
 
         $lotes = $query->orderByDesc('created_at')->paginate(12);
-        $fincas = Finca::orderBy('Nombre')->get();
+        
+        // Obtener solo fincas accesibles para el usuario
+        $fincas = $this->getFincasAccesibles();
 
         return view('admin.lotes.index', compact('lotes', 'fincas'));
     }
@@ -34,7 +42,14 @@ class LoteController extends Controller
     // Form crear
     public function create()
     {
-        $fincas = Finca::orderBy('Nombre')->get();
+        // Solo mostrar fincas a las que el usuario tiene acceso
+        $fincas = $this->getFincasAccesibles();
+        
+        if ($fincas->isEmpty() && !auth()->user()->hasRole('Administrador')) {
+            return redirect()->route('sin-fincas')
+                ->with('error', 'No tienes fincas asignadas para crear lotes.');
+        }
+        
         return view('admin.lotes.create', compact('fincas'));
     }
 
@@ -55,15 +70,63 @@ class LoteController extends Controller
             'CantidadInicial.required' => 'La cantidad inicial es obligatoria.',
         ]);
 
-        $lote = Lote::create($validated);
+        // Para propietarios y empleados, verificar que la finca esté en su lista accesible
+        $user = auth()->user();
+        if ($user && !$user->hasRole('Administrador')) {
+            $fincasAccesibles = $user->fincas()->pluck('fincas.IDFinca')->toArray();
+            
+            if (!in_array($validated['IDFinca'], $fincasAccesibles)) {
+                \Log::warning('Usuario intentó crear lote en finca no asignada', [
+                    'user_id' => $user->IDUsuario,
+                    'finca_id' => $validated['IDFinca'],
+                    'fincas_accesibles' => $fincasAccesibles
+                ]);
+                
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'No tienes permiso para crear lotes en esta finca.');
+            }
+        }
 
-        return redirect()->route('admin.lotes.index')
-            ->with('success', 'Lote creado correctamente.');
+        try {
+            $lote = Lote::create($validated);
+
+            // Redirigir según el contexto del usuario
+            $route = 'admin.lotes.index';
+            if ($request->routeIs('owner.*')) {
+                $route = 'owner.lotes.index';
+            } elseif ($request->routeIs('employee.*')) {
+                $route = 'employee.lotes.index';
+            }
+
+            \Log::info('Lote creado exitosamente', [
+                'lote_id' => $lote->IDLote,
+                'user_id' => $user->IDUsuario ?? null,
+                'finca_id' => $validated['IDFinca']
+            ]);
+
+            return redirect()->route($route)
+                ->with('success', 'Lote creado correctamente.');
+        } catch (\Exception $e) {
+            \Log::error('Error al crear lote: ' . $e->getMessage(), [
+                'validated' => $validated,
+                'user_id' => $user->IDUsuario ?? null
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al crear el lote: ' . $e->getMessage());
+        }
     }
 
     // Ver
     public function show(Lote $lote)
     {
+        // Verificar acceso al lote
+        if (!$this->verificarAccesoLote($lote->IDLote)) {
+            abort(403, 'No tienes permiso para ver este lote.');
+        }
+
         // Cargar relaciones necesarias
         $lote->load(['finca', 'gallinas.tipoGallina']);
         
@@ -189,13 +252,24 @@ class LoteController extends Controller
     // Form editar
     public function edit(Lote $lote)
     {
-        $fincas = Finca::orderBy('Nombre')->get();
+        // Verificar acceso al lote
+        if (!$this->verificarAccesoLote($lote->IDLote)) {
+            abort(403, 'No tienes permiso para editar este lote.');
+        }
+
+        $fincas = $this->getFincasAccesibles();
         return view('admin.lotes.edit', compact('lote', 'fincas'));
     }
 
     // Actualizar
     public function update(Request $request, Lote $lote)
     {
+        // Verificar acceso al lote original
+        if (!$this->verificarAccesoLote($lote->IDLote)) {
+            return redirect()->back()
+                ->with('error', 'No tienes permiso para editar este lote.');
+        }
+
         $validated = $request->validate([
             'IDFinca' => 'required|exists:fincas,IDFinca',
             'Nombre' => 'required|string|max:100',
@@ -204,17 +278,62 @@ class LoteController extends Controller
             'Raza' => 'nullable|string|max:50',
         ]);
 
-        $lote->update($validated);
+        // Verificar acceso a la nueva finca si cambió
+        if ($lote->IDFinca != $validated['IDFinca']) {
+            if (!$this->verificarAccesoFinca($validated['IDFinca'])) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'No tienes permiso para mover el lote a esa finca.');
+            }
+        }
 
-        return redirect()->route('admin.lotes.index')
-            ->with('success', 'Lote actualizado correctamente.');
+        try {
+            $lote->update($validated);
+
+            // Redirigir según el contexto del usuario
+            $route = 'admin.lotes.index';
+            if ($request->routeIs('owner.*')) {
+                $route = 'owner.lotes.index';
+            } elseif ($request->routeIs('employee.*')) {
+                $route = 'employee.lotes.index';
+            }
+
+            return redirect()->route($route)
+                ->with('success', 'Lote actualizado correctamente.');
+        } catch (\Exception $e) {
+            \Log::error('Error al actualizar lote: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al actualizar el lote. Por favor, intenta de nuevo.');
+        }
     }
 
     // Eliminar
-    public function destroy(Lote $lote)
+    public function destroy(Request $request, Lote $lote)
     {
-        $lote->delete();
-        return redirect()->route('admin.lotes.index')
-            ->with('success', 'Lote eliminado correctamente.');
+        // Verificar acceso al lote
+        if (!$this->verificarAccesoLote($lote->IDLote)) {
+            return redirect()->back()
+                ->with('error', 'No tienes permiso para eliminar este lote.');
+        }
+
+        try {
+            $lote->delete();
+
+            // Redirigir según el contexto del usuario
+            $route = 'admin.lotes.index';
+            if ($request->routeIs('owner.*')) {
+                $route = 'owner.lotes.index';
+            } elseif ($request->routeIs('employee.*')) {
+                $route = 'employee.lotes.index';
+            }
+
+            return redirect()->route($route)
+                ->with('success', 'Lote eliminado correctamente.');
+        } catch (\Exception $e) {
+            \Log::error('Error al eliminar lote: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Error al eliminar el lote. Puede que tenga aves asociadas.');
+        }
     }
 }

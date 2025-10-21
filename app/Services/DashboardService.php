@@ -14,6 +14,17 @@ class DashboardService
 {
     public function getStatistics()
     {
+        $user = auth()->user();
+        $role = $user && $user->role ? $user->role->NombreRol : null;
+
+        // Verificar si el usuario tiene fincas asignadas (excepto admin)
+        if ($role !== 'Administrador' && $user && !$user->hasFincasAsignadas()) {
+            return [
+                'error' => 'sin_fincas',
+                'message' => 'No tienes fincas asignadas'
+            ];
+        }
+
         $base = [
             'users' => $this->getUserStatistics(),
             'birds' => $this->getBirdStatistics(),
@@ -22,10 +33,9 @@ class DashboardService
             'inventory' => $this->getInventoryStatistics(),
         ];
 
-        $user = auth()->user();
-        $role = $user && $user->role ? $user->role->NombreRol : null;
-        if ($role === 'Empleado') {
-            $base = array_merge($base, $this->getEmployeeStatistics());
+        // Agregar estadísticas específicas por rol
+        if ($role === 'Empleado' || $role === 'Propietario') {
+            $base = array_merge($base, $this->getAssignedFarmsStatistics());
         }
 
         return $base;
@@ -33,17 +43,47 @@ class DashboardService
 
     public function getEmployeeStatistics(): array
     {
+        return $this->getAssignedFarmsStatistics();
+    }
+
+    public function getAssignedFarmsStatistics(): array
+    {
         $user = auth()->user();
         $assignedFarms = 0;
         $farms = collect();
         $eggsToday = 0;
+        $totalLots = 0;
+        $totalBirds = 0;
+
         if ($user) {
             try {
-                $farms = $user->fincas()->select('fincas.IDFinca','fincas.Nombre','fincas.Ubicacion')->orderBy('Nombre')->get();
+                // Obtener fincas asignadas con información adicional
+                $farms = $user->fincas()
+                    ->select('fincas.IDFinca','fincas.Nombre','fincas.Ubicacion', 'fincas.Hectareas')
+                    ->orderBy('Nombre')
+                    ->get();
+                
                 $assignedFarms = $farms->count();
-                if (Schema::hasTable('produccion_huevos')) {
-                    $fincaIds = $farms->pluck('IDFinca');
-                    if ($fincaIds->isNotEmpty()) {
+                $fincaIds = $farms->pluck('IDFinca');
+
+                if ($fincaIds->isNotEmpty()) {
+                    // Contar lotes de las fincas asignadas
+                    if (Schema::hasTable('lotes')) {
+                        $totalLots = DB::table('lotes')
+                            ->whereIn('IDFinca', $fincaIds)
+                            ->count();
+                    }
+
+                    // Contar aves de las fincas asignadas
+                    if (Schema::hasTable('gallinas') && Schema::hasTable('lotes')) {
+                        $totalBirds = DB::table('gallinas')
+                            ->join('lotes', 'gallinas.IDLote', '=', 'lotes.IDLote')
+                            ->whereIn('lotes.IDFinca', $fincaIds)
+                            ->count();
+                    }
+
+                    // Producción de huevos hoy
+                    if (Schema::hasTable('produccion_huevos')) {
                         $eggsToday = DB::table('produccion_huevos as ph')
                             ->join('lotes as l','ph.IDLote','=','l.IDLote')
                             ->whereIn('l.IDFinca', $fincaIds)
@@ -52,14 +92,29 @@ class DashboardService
                     }
                 }
             } catch (\Throwable $e) {
+                \Log::error('Error obteniendo estadísticas de fincas: ' . $e->getMessage());
                 $assignedFarms = 0;
                 $farms = collect();
             }
         }
+
         return [
-            'assignedFarms' => $assignedFarms,
-            'assignedFarmsList' => $farms,
-            'eggsToday' => (int) $eggsToday,
+            'farms' => [
+                'total' => $assignedFarms,
+                'list' => $farms,
+            ],
+            'lots' => [
+                'total' => $totalLots,
+            ],
+            'birds' => [
+                'total' => $totalBirds,
+            ],
+            'eggProduction' => [
+                'today' => (int) $eggsToday,
+            ],
+            'assignedFarms' => $assignedFarms, // Backward compatibility
+            'assignedFarmsList' => $farms, // Backward compatibility
+            'eggsToday' => (int) $eggsToday, // Backward compatibility
             'todayTasks' => (int) $eggsToday,
             'pendingReports' => 0,
         ];

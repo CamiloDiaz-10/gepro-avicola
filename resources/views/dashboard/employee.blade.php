@@ -26,6 +26,56 @@
         </div>
     </div>
         
+    <!-- Fincas Asignadas -->
+    @if(isset($statistics['farms']['list']) && $statistics['farms']['list']->isNotEmpty())
+    <div class="mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                    <i class="fas fa-map-marked-alt text-green-600 dark:text-green-400 mr-2"></i>
+                    Fincas Asignadas
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Tienes acceso a {{ $statistics['farms']['total'] }} {{ $statistics['farms']['total'] == 1 ? 'finca' : 'fincas' }}
+                </p>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($statistics['farms']['list'] as $finca)
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800 hover:shadow-md transition-shadow">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-green-600 bg-opacity-75 rounded-full mr-3">
+                                    <i class="fas fa-warehouse text-white text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 dark:text-white text-lg">{{ $finca->Nombre }}</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                                        <i class="fas fa-check-circle mr-1"></i> Acceso Activo
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-map-marker-alt w-5 text-gray-500 dark:text-gray-400"></i>
+                                <span class="ml-2">{{ $finca->Ubicacion }}</span>
+                            </div>
+                            @if($finca->Hectareas)
+                            <div class="flex items-center text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-ruler-combined w-5 text-gray-500 dark:text-gray-400"></i>
+                                <span class="ml-2">{{ number_format($finca->Hectareas, 2) }} hectáreas</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <!-- Assigned Farms Card -->

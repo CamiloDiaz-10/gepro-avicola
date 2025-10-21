@@ -77,6 +77,145 @@
             </div>
         </div>
 
+        <!-- Estadísticas por Lote: Mejor y Peor Producción -->
+        @if($mejorLote && $peorLote)
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Lote con MAYOR Producción -->
+            @if($mejorLote)
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 shadow-lg rounded-lg p-6 border-2 border-green-300 dark:border-green-700">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fas fa-trophy text-green-600 dark:text-green-400 text-2xl"></i>
+                            <h2 class="text-xl font-bold text-green-800 dark:text-green-300">Lote con Mayor Producción</h2>
+                        </div>
+                        <p class="text-sm text-green-600 dark:text-green-400">En el período seleccionado</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $mejorLote->Nombre }}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>{{ $mejorLote->finca->Nombre ?? 'Sin finca' }}
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-3xl font-bold text-green-600 dark:text-green-400">
+                                    {{ number_format($mejorLote->total_producido) }}
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">huevos totales</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <div class="text-center">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Promedio Diario</div>
+                                <div class="text-xl font-semibold text-gray-900 dark:text-white">{{ number_format($mejorLote->promedio_diario, 1) }}</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Días con Registro</div>
+                                <div class="text-xl font-semibold text-gray-900 dark:text-white">{{ $mejorLote->dias_registrados }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 text-sm text-green-700 dark:text-green-400">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Este lote está generando la mayor producción</span>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Lote con MENOR Producción -->
+            @if($peorLote)
+            <div class="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 shadow-lg rounded-lg p-6 border-2 border-orange-300 dark:border-orange-700">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fas fa-exclamation-triangle text-orange-600 dark:text-orange-400 text-2xl"></i>
+                            <h2 class="text-xl font-bold text-orange-800 dark:text-orange-300">Lote con Menor Producción</h2>
+                        </div>
+                        <p class="text-sm text-orange-600 dark:text-orange-400">Requiere atención</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $peorLote->Nombre }}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>{{ $peorLote->finca->Nombre ?? 'Sin finca' }}
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                                    {{ number_format($peorLote->total_producido) }}
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">huevos totales</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <div class="text-center">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Promedio Diario</div>
+                                <div class="text-xl font-semibold text-gray-900 dark:text-white">{{ number_format($peorLote->promedio_diario, 1) }}</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Días con Registro</div>
+                                <div class="text-xl font-semibold text-gray-900 dark:text-white">{{ $peorLote->dias_registrados }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 text-sm text-orange-700 dark:text-orange-400">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Considera revisar condiciones y alimentación de este lote</span>
+                    </div>
+                </div>
+            </div>
+            @endif
+        </div>
+        @elseif($produccionPorLote->count() === 1)
+        <!-- Mensaje cuando solo hay 1 lote con producción -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 p-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-400 text-2xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-blue-800 dark:text-blue-300">
+                        Solo hay un lote con producción registrada
+                    </h3>
+                    <p class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+                        Se necesitan al menos 2 lotes diferentes con producción en el período seleccionado para mostrar la comparación de mejor y peor lote.
+                    </p>
+                </div>
+            </div>
+        </div>
+        @elseif($produccionPorLote->count() === 0)
+        <!-- Mensaje cuando no hay lotes con producción -->
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-2xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-300">
+                        No hay registros de producción
+                    </h3>
+                    <p class="mt-2 text-sm text-yellow-700 dark:text-yellow-400">
+                        No se encontraron registros de producción de huevos en el período seleccionado. Registra producción para ver las estadísticas por lote.
+                    </p>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
             <h2 class="text-lg font-semibold dark:text-white mb-4">Producción diaria</h2>
             <canvas id="chartDaily"></canvas>

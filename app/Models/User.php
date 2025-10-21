@@ -94,4 +94,64 @@ class User extends Authenticatable
     {
         return $this->role ? $this->role->NombreRol : null;
     }
+
+    /**
+     * Check if user has any fincas assigned
+     */
+    public function hasFincasAsignadas()
+    {
+        return $this->fincas()->count() > 0;
+    }
+
+    /**
+     * Get IDs of user's assigned fincas
+     */
+    public function getFincaIds()
+    {
+        return $this->fincas()->pluck('fincas.IDFinca')->toArray();
+    }
+
+    /**
+     * Check if user has access to a specific finca
+     */
+    public function hasAccessToFinca($fincaId)
+    {
+        // Admins have access to all fincas
+        if ($this->hasRole('Administrador')) {
+            return true;
+        }
+
+        return $this->fincas()->where('fincas.IDFinca', $fincaId)->exists();
+    }
+
+    /**
+     * Check if user has access to a specific lote
+     */
+    public function hasAccessToLote($loteId)
+    {
+        // Admins have access to all lotes
+        if ($this->hasRole('Administrador')) {
+            return true;
+        }
+
+        $lote = \App\Models\Lote::find($loteId);
+        if (!$lote) {
+            return false;
+        }
+
+        return $this->hasAccessToFinca($lote->IDFinca);
+    }
+
+    /**
+     * Get accessible lotes for this user
+     */
+    public function getAccessibleLotes()
+    {
+        if ($this->hasRole('Administrador')) {
+            return \App\Models\Lote::all();
+        }
+
+        $fincaIds = $this->getFincaIds();
+        return \App\Models\Lote::whereIn('IDFinca', $fincaIds)->get();
+    }
 }

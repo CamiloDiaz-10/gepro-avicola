@@ -57,7 +57,7 @@
                         <div class="font-semibold dark:text-white">{{ $bird->FechaNacimiento ? \Carbon\Carbon::parse($bird->FechaNacimiento)->format('d/m/Y') : '-' }}</div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Peso (g)</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Peso (L)</div>
                         <div class="font-semibold dark:text-white">{{ $bird->Peso ?? '-' }}</div>
                     </div>
                 </div>

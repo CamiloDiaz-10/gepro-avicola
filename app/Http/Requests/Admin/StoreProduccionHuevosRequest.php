@@ -22,7 +22,6 @@ class StoreProduccionHuevosRequest extends FormRequest
             'HuevosRotos' => ['nullable','integer','min:0','lte:CantidadHuevos'],
             'Turno' => ['nullable','in:Mañana,Tarde,Noche'],
             'PesoPromedio' => ['nullable','numeric','min:0','max:200'],
-            'PorcentajePostura' => ['nullable','numeric','min:0','max:100'],
             'Observaciones' => ['nullable','string','max:500'],
         ];
     }

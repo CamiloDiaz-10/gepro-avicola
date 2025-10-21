@@ -5,7 +5,14 @@
 @section('content')
 @php
     $current = Route::currentRouteName();
-    $area = \Illuminate\Support\Str::startsWith($current, 'owner.') ? 'owner' : (\Illuminate\Support\Str::startsWith($current, 'veterinario.') ? 'veterinario' : 'admin');
+    $area = 'admin'; // Default
+    if (\Illuminate\Support\Str::startsWith($current, 'owner.')) {
+        $area = 'owner';
+    } elseif (\Illuminate\Support\Str::startsWith($current, 'employee.')) {
+        $area = 'employee';
+    } elseif (\Illuminate\Support\Str::startsWith($current, 'veterinario.')) {
+        $area = 'veterinario';
+    }
     $isVeterinario = auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Veterinario';
 @endphp
 <div class="p-6">
@@ -109,7 +116,7 @@
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Lote</th>
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Tipo</th>
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Nacimiento</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Peso (g)</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Peso (Lb)</th>
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Estado</th>
                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
                         </tr>

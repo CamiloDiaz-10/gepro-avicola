@@ -228,6 +228,37 @@
             <li>
                 <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Mis Fincas
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('owner.lotes.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.lotes.index') || request()->routeIs('owner.lotes.show') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-layer-group text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Gestionar Lotes
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestionar Lotes</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('owner.lotes.create') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('owner.lotes.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Crear Lote
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Crear Lote</span>
+                </a>
+            </li>
+            
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Producción
                 </div>
             </li>
@@ -314,6 +345,25 @@
             <li>
                 <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
                      :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Mis Fincas
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('employee.lotes.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('employee.lotes.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-layer-group text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Mis Lotes
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Mis Lotes</span>
+                </a>
+            </li>
+            
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                     Producción
                 </div>
             </li>
@@ -364,6 +414,25 @@
                           :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
                         {{ $empFarmsCount }}
                     </span>
+                </a>
+            </li>
+
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Reportes
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('employee.reports.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('employee.reports.*') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-chart-bar text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Reportes
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Reportes</span>
                 </a>
             </li>
             @endif

@@ -46,6 +46,11 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register')->middleware('guest');
 Route::post('/register', [AuthController::class, 'register']);
 
+// Ruta para usuarios sin fincas asignadas
+Route::get('/sin-fincas', function() {
+    return view('sin-fincas');
+})->name('sin-fincas')->middleware('auth');
+
 // Ruta de prueba para verificar autenticación
 Route::get('/test-auth', function() {
     if (auth()->check()) {
@@ -170,6 +175,15 @@ Route::middleware('auth')->group(function () {
     
     // Rutas específicas para propietarios (comentadas hasta crear los controladores)
     Route::middleware(['role:Propietario'])->prefix('owner')->name('owner.')->group(function () {
+        // Lotes (Propietario) - CRUD completo para lotes de sus fincas asignadas
+        Route::get('lotes', [\App\Http\Controllers\Admin\LoteController::class, 'index'])->name('lotes.index');
+        Route::get('lotes/create', [\App\Http\Controllers\Admin\LoteController::class, 'create'])->name('lotes.create');
+        Route::post('lotes', [\App\Http\Controllers\Admin\LoteController::class, 'store'])->name('lotes.store');
+        Route::get('lotes/{lote}', [\App\Http\Controllers\Admin\LoteController::class, 'show'])->name('lotes.show');
+        Route::get('lotes/{lote}/edit', [\App\Http\Controllers\Admin\LoteController::class, 'edit'])->name('lotes.edit');
+        Route::put('lotes/{lote}', [\App\Http\Controllers\Admin\LoteController::class, 'update'])->name('lotes.update');
+        Route::delete('lotes/{lote}', [\App\Http\Controllers\Admin\LoteController::class, 'destroy'])->name('lotes.destroy');
+
         // Producción de Huevos (Propietario)
         Route::get('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'index'])->name('produccion-huevos.index');
         Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
@@ -181,6 +195,7 @@ Route::middleware('auth')->group(function () {
         Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
         Route::get('aves/create', [\App\Http\Controllers\Admin\BirdsController::class, 'create'])->name('aves.create');
         Route::post('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'store'])->name('aves.store');
+        Route::get('aves/qr/{token}', [\App\Http\Controllers\Admin\BirdsController::class, 'showByQr'])->name('aves.show.byqr');
         Route::patch('aves/{bird}/estado', [\App\Http\Controllers\Admin\BirdsController::class, 'updateEstado'])->name('aves.estado.update');
         Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
         Route::get('aves/scan', [\App\Http\Controllers\Admin\BirdsController::class, 'scan'])->name('aves.scan');
@@ -196,15 +211,31 @@ Route::middleware('auth')->group(function () {
     
     // Rutas específicas para empleados 
     Route::middleware(['role:Empleado'])->prefix('employee')->name('employee.')->group(function () {
+        // Lotes (Empleado) - Ver lotes de sus fincas asignadas
+        Route::get('lotes', [\App\Http\Controllers\Admin\LoteController::class, 'index'])->name('lotes.index');
+        Route::get('lotes/{lote}', [\App\Http\Controllers\Admin\LoteController::class, 'show'])->name('lotes.show');
+
         // Producción de Huevos (Empleado)
         Route::get('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'index'])->name('produccion-huevos.index');
         Route::get('produccion-huevos/create', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'create'])->name('produccion-huevos.create');
         Route::post('produccion-huevos', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'store'])->name('produccion-huevos.store');
         Route::get('produccion-huevos/export/csv', [\App\Http\Controllers\Admin\ProduccionHuevosController::class, 'exportCsv'])->name('produccion-huevos.export.csv');
 
+        // Aves (Empleado) reutilizando controlador Admin
+        Route::get('aves', [\App\Http\Controllers\Admin\BirdsController::class, 'index'])->name('aves.index');
+        Route::get('aves/qr/{token}', [\App\Http\Controllers\Admin\BirdsController::class, 'showByQr'])->name('aves.show.byqr');
+        Route::get('aves/export/csv', [\App\Http\Controllers\Admin\BirdsController::class, 'exportCsv'])->name('aves.export.csv');
+
         // Fincas asignadas (Empleado) reutilizando controlador Admin
         Route::get('fincas', [\App\Http\Controllers\Admin\FincaController::class, 'index'])->name('fincas.index');
         Route::get('fincas/{finca}', [\App\Http\Controllers\Admin\FincaController::class, 'show'])->name('fincas.show');
+
+        // Reportes (Empleado) reutilizando controlador Admin
+        Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/export/production', [\App\Http\Controllers\Admin\ReportController::class, 'exportProduction'])->name('reports.export.production');
+        Route::get('reports/export/feeding', [\App\Http\Controllers\Admin\ReportController::class, 'exportFeeding'])->name('reports.export.feeding');
+        Route::get('reports/export/health', [\App\Http\Controllers\Admin\ReportController::class, 'exportHealth'])->name('reports.export.health');
+        Route::get('reports/export/finance', [\App\Http\Controllers\Admin\ReportController::class, 'exportFinance'])->name('reports.export.finance');
     });
     
     // Rutas específicas para veterinarios

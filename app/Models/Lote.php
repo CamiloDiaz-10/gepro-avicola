@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasFincaScope;
 
 class Lote extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFincaScope;
 
     protected $table = 'lotes';
     protected $primaryKey = 'IDLote';
@@ -81,31 +82,113 @@ class Lote extends Model
     }
 
     /**
-     * Obtener el número mínimo de huevos esperado por día (promedio: 4 huevos/ave)
+     * Obtener el tipo predominante de gallinas en el lote
+     */
+    public function getTipoPredominanteAttribute()
+    {
+        $tipoMasComun = $this->gallinas()
+            ->activas()
+            ->select('IDTipoGallina', \DB::raw('COUNT(*) as total'))
+            ->groupBy('IDTipoGallina')
+            ->orderByDesc('total')
+            ->first();
+
+        if ($tipoMasComun) {
+            return TipoGallina::find($tipoMasComun->IDTipoGallina);
+        }
+
+        return null;
+    }
+
+    /**
+     * Verificar si el lote es de aves de engorde (no ponen huevos)
+     */
+    public function getEsLoteDeEngordeAttribute()
+    {
+        $tipoPredominante = $this->tipo_predominante;
+        // Si no hay tipo predominante, asumimos que NO es de engorde
+        return $tipoPredominante && $tipoPredominante->Nombre === 'Engorde';
+    }
+
+    /**
+     * Verificar si el lote puede producir huevos
+     */
+    public function getPuedeProducirHuevosAttribute()
+    {
+        $tipoPredominante = $this->tipo_predominante;
+        // Si no hay tipo, permitir (puede ser lote nuevo sin gallinas)
+        if (!$tipoPredominante) {
+            return true;
+        }
+        // Si hay tipo, verificar que NO sea engorde
+        return $tipoPredominante->Nombre !== 'Engorde';
+    }
+
+    /**
+     * Obtener promedios de producción según tipo de gallina
+     */
+    private function getPromediosPorTipo()
+    {
+        $tipoPredominante = $this->tipo_predominante;
+        
+        if (!$tipoPredominante) {
+            // Valores por defecto si no hay tipo definido
+            return ['min' => 0.5, 'promedio' => 0.8, 'max' => 1.0];
+        }
+
+        // Promedios según el tipo de gallina
+        switch ($tipoPredominante->Nombre) {
+            case 'Ponedora':
+                // Ponedoras: 5-7 huevos por día por ave (según requerimiento)
+                return ['min' => 5.0, 'promedio' => 6.0, 'max' => 7.0];
+            
+            case 'Criolla':
+                // Criollas: 0.4 - 0.7 huevos por día
+                return ['min' => 0.4, 'promedio' => 0.55, 'max' => 0.7];
+            
+            case 'Doble Propósito':
+                return ['min' => 0.7, 'promedio' => 0.8, 'max' => 0.9];
+            
+            case 'Reproductora':
+                return ['min' => 0.6, 'promedio' => 0.8, 'max' => 1.0];
+            
+            case 'Engorde':
+                // Aves de engorde NO ponen huevos
+                return ['min' => 0, 'promedio' => 0, 'max' => 0];
+            
+            default:
+                return ['min' => 0.5, 'promedio' => 0.8, 'max' => 1.0];
+        }
+    }
+
+    /**
+     * Obtener el número mínimo de huevos esperado por día según tipo de gallina
      */
     public function getProduccionMinimaEsperadaAttribute()
     {
         $avesActivas = $this->aves_activas_count;
-        // Consideramos 3 huevos/ave como mínimo razonable
-        return $avesActivas * 3;
+        $promedios = $this->getPromediosPorTipo();
+        return round($avesActivas * $promedios['min'], 1);
     }
 
     /**
-     * Obtener el número promedio de huevos esperado por día (4 huevos/ave)
+     * Obtener el número promedio de huevos esperado por día según tipo de gallina
      */
     public function getProduccionPromedioEsperadaAttribute()
     {
         $avesActivas = $this->aves_activas_count;
-        return $avesActivas * 4;
+        $promedios = $this->getPromediosPorTipo();
+        return round($avesActivas * $promedios['promedio'], 1);
     }
 
     /**
-     * Obtener el número máximo de huevos esperado por día (5 huevos/ave)
+     * Obtener el número máximo de huevos esperado por día según tipo de gallina
      */
     public function getProduccionMaximaEsperadaAttribute()
     {
         $avesActivas = $this->aves_activas_count;
-        return $avesActivas * 5;
+        $promedios = $this->getPromediosPorTipo();
+        return round($avesActivas * $promedios['max'], 1);
     }
 
     /**
@@ -113,6 +196,14 @@ class Lote extends Model
      */
     public function validarCantidadHuevos($cantidad)
     {
+        // Verificar si es lote de engorde
+        if ($this->es_lote_de_engorde) {
+            return [
+                'valido' => false,
+                'mensaje' => 'Este lote es de aves de engorde, no producen huevos.'
+            ];
+        }
+
         $avesActivas = $this->aves_activas_count;
         
         if ($avesActivas == 0) {
@@ -122,12 +213,23 @@ class Lote extends Model
             ];
         }
 
-        $maxEsperado = $avesActivas * 5; // Máximo 5 huevos/ave por día
+        $maxEsperado = $this->produccion_maxima_esperada;
+        $minEsperado = $this->produccion_minima_esperada;
+        $tipoPredominante = $this->tipo_predominante;
+        $nombreTipo = $tipoPredominante ? $tipoPredominante->Nombre : 'general';
+        $promedios = $this->getPromediosPorTipo();
 
         if ($cantidad > $maxEsperado) {
             return [
                 'valido' => false,
-                'mensaje' => "La cantidad excede el máximo posible de {$maxEsperado} huevos ({$avesActivas} aves × 5 huevos/ave)."
+                'mensaje' => "La cantidad excede el máximo posible de {$maxEsperado} huevos para {$avesActivas} aves {$nombreTipo} (máx: {$promedios['max']} huevos/ave)."
+            ];
+        }
+
+        if ($cantidad < $minEsperado) {
+            return [
+                'valido' => false,
+                'mensaje' => "La cantidad es demasiado baja. Mínimo esperado: {$minEsperado} huevos para {$avesActivas} aves {$nombreTipo} (mín: {$promedios['min']} huevos/ave)."
             ];
         }
 

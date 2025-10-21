@@ -25,7 +25,7 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div class="flex items-center">
                 <div class="p-3 rounded-full bg-blue-600 bg-opacity-75">
@@ -34,6 +34,18 @@
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400 uppercase">Mis Fincas</p>
                     <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $statistics['farms']['total'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-indigo-600 bg-opacity-75">
+                    <i class="fas fa-layer-group text-white text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 uppercase">Total Lotes</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $statistics['lots']['total'] ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -62,6 +74,75 @@
             </div>
         </div>
     </div>
+
+    <!-- Fincas Asignadas -->
+    @if(isset($statistics['farms']['list']) && $statistics['farms']['list']->isNotEmpty())
+    <div class="mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                    <i class="fas fa-map-marked-alt text-blue-600 dark:text-blue-400 mr-2"></i>
+                    Mis Fincas Asignadas
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Tienes acceso a {{ $statistics['farms']['total'] }} {{ $statistics['farms']['total'] == 1 ? 'finca' : 'fincas' }}
+                </p>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($statistics['farms']['list'] as $finca)
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-shadow">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-blue-600 bg-opacity-75 rounded-full mr-3">
+                                    <i class="fas fa-warehouse text-white text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 dark:text-white text-lg">{{ $finca->Nombre }}</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
+                                        <i class="fas fa-check-circle mr-1"></i> Acceso Activo
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-map-marker-alt w-5 text-gray-500 dark:text-gray-400"></i>
+                                <span class="ml-2">{{ $finca->Ubicacion }}</span>
+                            </div>
+                            @if($finca->Hectareas)
+                            <div class="flex items-center text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-ruler-combined w-5 text-gray-500 dark:text-gray-400"></i>
+                                <span class="ml-2">{{ number_format($finca->Hectareas, 2) }} hectáreas</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+    @else
+    <!-- Sin fincas asignadas -->
+    <div class="mb-6">
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-2xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-300">
+                        Sin Fincas Asignadas
+                    </h3>
+                    <p class="mt-2 text-sm text-yellow-700 dark:text-yellow-400">
+                        Actualmente no tienes fincas asignadas. Contacta al administrador del sistema para solicitar acceso a una o más fincas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Actions Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

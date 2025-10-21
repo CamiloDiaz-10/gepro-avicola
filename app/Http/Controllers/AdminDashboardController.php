@@ -8,14 +8,25 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Finca;
+use App\Models\Lote;
+use App\Models\Gallina;
+use App\Traits\FiltroFincasHelper;
 
 class AdminDashboardController extends Controller
 {
+    use FiltroFincasHelper;
+
     // El middleware se aplica en las rutas
 
     public function index()
     {
         try {
+            // Verificar si el usuario tiene fincas asignadas (excepto admins)
+            $user = auth()->user();
+            if (!$user->hasRole('Administrador') && !$user->hasFincasAsignadas()) {
+                return redirect()->route('sin-fincas');
+            }
+
             $statistics = $this->getAdminStatistics();
             
             return view('admin.dashboard', compact('statistics'));
@@ -32,34 +43,77 @@ class AdminDashboardController extends Controller
 
     private function getAdminStatistics()
     {
+        $user = auth()->user();
+        $fincaIds = $user->hasRole('Administrador') ? [] : $user->getFincaIds();
+
         return [
-            'overview' => $this->getOverviewStats(),
+            'overview' => $this->getOverviewStats($fincaIds),
             'users' => $this->getUserStats(),
-            'farms' => $this->getFarmStats(),
-            'birds' => $this->getBirdStats(),
-            'production' => $this->getProductionStats(),
-            'health' => $this->getHealthStats(),
-            'feeding' => $this->getFeedingStats(),
-            'financial' => $this->getFinancialStats(),
-            'recent_activities' => $this->getRecentActivities()
+            'farms' => $this->getFarmStats($fincaIds),
+            'birds' => $this->getBirdStats($fincaIds),
+            'production' => $this->getProductionStats($fincaIds),
+            'health' => $this->getHealthStats($fincaIds),
+            'feeding' => $this->getFeedingStats($fincaIds),
+            'financial' => $this->getFinancialStats($fincaIds),
+            'recent_activities' => $this->getRecentActivities($fincaIds)
         ];
     }
 
-    private function getOverviewStats()
+    private function getOverviewStats($fincaIds = [])
     {
+        $esAdmin = empty($fincaIds);
+
         return [
             'total_users' => $this->safeCount('usuarios'),
-            'total_farms' => $this->safeCount('fincas'),
-            'total_lots' => $this->safeCount('lotes'),
-            'total_birds' => $this->safeCount('gallinas'),
-            'active_lots' => $this->safeCount('lotes'), // Todos los lotes por ahora
-            'today_production' => $this->getTodayEggProduction(),
-            'pending_health_alerts' => $this->getPendingHealthAlerts(),
+            'total_farms' => $esAdmin ? $this->safeCount('fincas') : count($fincaIds),
+            'total_lots' => $this->getFilteredCount('lotes', $fincaIds),
+            'total_birds' => $this->getFilteredBirdsCount($fincaIds),
+            'active_lots' => $this->getFilteredCount('lotes', $fincaIds),
+            'today_production' => $this->getTodayEggProduction($fincaIds),
+            'pending_health_alerts' => $this->getPendingHealthAlerts($fincaIds),
             'low_stock_feeds' => $this->getLowStockFeeds(),
             // Resumen financiero
-            'estimated_total_expenses_30d' => $this->getTotalExpenses(30),
-            'estimated_net_revenue_30d' => $this->getFinancialStats()['revenue'] - $this->getTotalExpenses(30),
+            'estimated_total_expenses_30d' => $this->getTotalExpenses(30, $fincaIds),
+            'estimated_net_revenue_30d' => $this->getFinancialStats($fincaIds)['revenue'] - $this->getTotalExpenses(30, $fincaIds),
         ];
+    }
+
+    // Helper para contar registros filtrados por finca
+    private function getFilteredCount($table, $fincaIds = [])
+    {
+        if (!Schema::hasTable($table)) {
+            return 0;
+        }
+
+        $query = DB::table($table);
+        
+        if (!empty($fincaIds)) {
+            if ($table === 'lotes') {
+                $query->whereIn('IDFinca', $fincaIds);
+            }
+        }
+
+        return $query->count();
+    }
+
+    // Helper para contar aves filtradas por finca (a través de lotes)
+    private function getFilteredBirdsCount($fincaIds = [])
+    {
+        if (!Schema::hasTable('gallinas')) {
+            return 0;
+        }
+
+        $query = DB::table('gallinas');
+
+        if (!empty($fincaIds)) {
+            $query->whereIn('IDLote', function($q) use ($fincaIds) {
+                $q->select('IDLote')
+                  ->from('lotes')
+                  ->whereIn('IDFinca', $fincaIds);
+            });
+        }
+
+        return $query->count();
     }
 
     private function getUserStats()
@@ -85,42 +139,57 @@ class AdminDashboardController extends Controller
         ];
     }
 
-    private function getFarmStats()
+    private function getFarmStats($fincaIds = [])
     {
         if (!Schema::hasTable('fincas')) {
             return ['total' => 0, 'by_location' => [], 'with_lots' => 0];
         }
 
+        $fincasQuery = DB::table('fincas');
+        if (!empty($fincaIds)) {
+            $fincasQuery->whereIn('IDFinca', $fincaIds);
+        }
+
         return [
-            'total' => DB::table('fincas')->count(),
-            'by_location' => DB::table('fincas')
+            'total' => (clone $fincasQuery)->count(),
+            'by_location' => (clone $fincasQuery)
                 ->select('Ubicacion', DB::raw('count(*) as total'))
                 ->groupBy('Ubicacion')
                 ->get(),
             'with_lots' => DB::table('fincas')
                 ->join('lotes', 'fincas.IDFinca', '=', 'lotes.IDFinca')
+                ->when(!empty($fincaIds), function($q) use ($fincaIds) {
+                    $q->whereIn('fincas.IDFinca', $fincaIds);
+                })
                 ->distinct('fincas.IDFinca')
                 ->count()
         ];
     }
 
-    private function getBirdStats()
+    private function getBirdStats($fincaIds = [])
     {
         if (!Schema::hasTable('gallinas')) {
             return ['by_type' => [], 'by_status' => [], 'by_age_group' => []];
         }
 
+        $gallinasQuery = DB::table('gallinas');
+        if (!empty($fincaIds)) {
+            $gallinasQuery->whereIn('IDLote', function($q) use ($fincaIds) {
+                $q->select('IDLote')->from('lotes')->whereIn('IDFinca', $fincaIds);
+            });
+        }
+
         return [
-            'by_type' => DB::table('gallinas')
+            'by_type' => (clone $gallinasQuery)
                 ->join('tipo_gallinas', 'gallinas.IDTipoGallina', '=', 'tipo_gallinas.IDTipoGallina')
                 ->select('tipo_gallinas.Nombre as type', DB::raw('count(*) as total'))
                 ->groupBy('tipo_gallinas.Nombre')
                 ->get(),
-            'by_status' => DB::table('gallinas')
+            'by_status' => (clone $gallinasQuery)
                 ->select('Estado as status', DB::raw('count(*) as total'))
                 ->groupBy('Estado')
                 ->get(),
-            'by_age_group' => $this->getBirdsByAgeGroup()
+            'by_age_group' => $this->getBirdsByAgeGroup($fincaIds)
         ];
     }
 

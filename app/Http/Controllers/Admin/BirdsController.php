@@ -208,6 +208,15 @@ class BirdsController extends Controller
         if (!$bird) {
             return view('admin.aves.qr-not-found', compact('token'));
         }
+
+        // Verificar acceso si el usuario está autenticado y no es admin
+        $user = auth()->user();
+        if ($user && !$user->hasRole('Administrador')) {
+            // Verificar si tiene acceso al lote de esta ave
+            if (!$user->hasAccessToLote($bird->IDLote)) {
+                abort(403, 'No tienes permiso para ver esta ave. Pertenece a una finca no asignada.');
+            }
+        }
         
         return view('admin.aves.show-by-qr', compact('bird'));
     }

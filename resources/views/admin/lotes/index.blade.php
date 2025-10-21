@@ -1,6 +1,15 @@
 @extends('layouts.app-with-sidebar')
 
 @section('content')
+@php
+    $current = Route::currentRouteName();
+    $area = 'admin'; // Default
+    if (\Illuminate\Support\Str::startsWith($current, 'owner.')) {
+        $area = 'owner';
+    } elseif (\Illuminate\Support\Str::startsWith($current, 'employee.')) {
+        $area = 'employee';
+    }
+@endphp
 <div class="p-6">
     <div class="max-w-7xl mx-auto space-y-6">
         <div>
@@ -25,15 +34,17 @@
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Filtros de Búsqueda</h2>
                     <p class="text-gray-500 dark:text-gray-400 text-sm">Busca por nombre, raza o finca</p>
                 </div>
-                <a href="{{ route('admin.lotes.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                @if($area !== 'employee')
+                <a href="{{ route($area.'.lotes.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     Nuevo Lote
                 </a>
+                @endif
             </div>
 
-            <form method="GET" action="{{ route('admin.lotes.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <form method="GET" action="{{ route($area.'.lotes.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Buscar</label>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Nombre o raza del lote" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -54,7 +65,7 @@
                         Filtrar
                     </button>
                     @if(request('search') || request('finca'))
-                        <a href="{{ route('admin.lotes.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors">
+                        <a href="{{ route($area.'.lotes.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors">
                             Limpiar
                         </a>
                     @endif
@@ -88,13 +99,15 @@
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">{{ number_format($lote->CantidadInicial) }}</td>
                             <td class="px-6 py-4 text-right text-sm">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.lotes.show', $lote) }}" class="text-blue-600 hover:text-blue-800">Ver</a>
-                                    <a href="{{ route('admin.lotes.edit', $lote) }}" class="text-yellow-600 hover:text-yellow-800">Editar</a>
-                                    <form action="{{ route('admin.lotes.destroy', $lote) }}" method="POST" onsubmit="return confirm('¿Eliminar este lote?')">
+                                    <a href="{{ route($area.'.lotes.show', $lote) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400">Ver</a>
+                                    @if($area !== 'employee')
+                                    <a href="{{ route($area.'.lotes.edit', $lote) }}" class="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400">Editar</a>
+                                    <form action="{{ route($area.'.lotes.destroy', $lote) }}" method="POST" onsubmit="return confirm('¿Eliminar este lote?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-red-600 hover:text-red-800">Eliminar</button>
+                                        <button class="text-red-600 hover:text-red-800 dark:text-red-400">Eliminar</button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

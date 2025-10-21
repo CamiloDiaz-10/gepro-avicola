@@ -30,7 +30,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lote</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lote (Solo lotes ponedores)</label>
                     <select name="IDLote" 
                             required 
                             x-model="loteSeleccionado"
@@ -38,10 +38,21 @@
                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         <option value="">Seleccione lote</option>
                         @foreach($lotes as $lote)
-                            <option value="{{ $lote->IDLote }}" {{ old('IDLote') == $lote->IDLote ? 'selected' : '' }}>{{ $lote->Nombre }}</option>
+                            @php
+                                $loteId = is_array($lote) ? $lote['IDLote'] : $lote->IDLote;
+                                $loteNombre = is_array($lote) ? $lote['Nombre'] : $lote->Nombre;
+                                $loteTipo = is_array($lote) && isset($lote['tipo']) ? $lote['tipo'] : (is_object($lote) && $lote->tipo_predominante ? $lote->tipo_predominante->Nombre : '');
+                            @endphp
+                            <option value="{{ $loteId }}" {{ old('IDLote') == $loteId ? 'selected' : '' }}>
+                                {{ $loteNombre }}
+                                @if($loteTipo)
+                                    ({{ $loteTipo }})
+                                @endif
+                            </option>
                         @endforeach
                     </select>
                     @error('IDLote')<p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p>@enderror
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Los lotes de engorde no aparecen porque no producen huevos</p>
                 </div>
 
                 <!-- Información del Lote Seleccionado -->
@@ -51,6 +62,10 @@
                     <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">📊 Información del Lote</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                         <div>
+                            <span class="text-gray-600 dark:text-gray-400">Tipo de Gallina:</span>
+                            <span class="font-semibold text-gray-900 dark:text-white ml-1" x-text="loteInfo?.tipo_gallina || 'N/A'"></span>
+                        </div>
+                        <div>
                             <span class="text-gray-600 dark:text-gray-400">Aves Activas:</span>
                             <span class="font-semibold text-gray-900 dark:text-white ml-1" x-text="loteInfo?.aves_activas || '0'"></span>
                         </div>
@@ -58,13 +73,19 @@
                             <span class="text-gray-600 dark:text-gray-400">Promedio Esperado:</span>
                             <span class="font-semibold text-gray-900 dark:text-white ml-1" x-text="loteInfo?.produccion_promedio || '0'"></span> huevos/día
                         </div>
+                        <div>
+                            <span class="text-gray-600 dark:text-gray-400">Huevos/Ave:</span>
+                            <span class="font-semibold text-purple-700 dark:text-purple-400 ml-1" x-text="loteInfo?.huevos_por_ave_promedio || '0'"></span> por ave
+                        </div>
                         <div class="col-span-2">
                             <span class="text-gray-600 dark:text-gray-400">Rango Esperado:</span>
                             <span class="font-semibold text-green-700 dark:text-green-400 ml-1">
                                 <span x-text="loteInfo?.produccion_minima || '0'"></span> - 
                                 <span x-text="loteInfo?.produccion_maxima || '0'"></span> huevos
                             </span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">(3-5 huevos/ave)</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                (<span x-text="loteInfo?.huevos_por_ave_min || '0'"></span>-<span x-text="loteInfo?.huevos_por_ave_max || '0'"></span> huevos/ave según tipo)
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -117,19 +138,11 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Peso Promedio (g)</label>
-                        <input type="number" step="0.01" name="PesoPromedio" value="{{ old('PesoPromedio') }}" min="0"
-                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                        @error('PesoPromedio')<p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">% Postura</label>
-                        <input type="number" step="0.01" name="PorcentajePostura" value="{{ old('PorcentajePostura') }}" min="0" max="100"
-                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                        @error('PorcentajePostura')<p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p>@enderror
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Peso Promedio (Lb)</label>
+                    <input type="number" step="0.01" name="PesoPromedio" value="{{ old('PesoPromedio') }}" min="0"
+                           class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    @error('PesoPromedio')<p class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</p>@enderror
                 </div>
 
                 <div>
@@ -186,7 +199,13 @@ function produccionForm() {
                     }
                 } else {
                     this.loteInfo = null;
-                    alert(data.message || 'Error al cargar información del lote');
+                    // Si es lote de engorde, mostrar mensaje específico
+                    if (data.es_engorde) {
+                        alert('⚠️ Este lote es de aves de engorde y no producen huevos. Por favor selecciona otro lote.');
+                        this.loteSeleccionado = '';
+                    } else {
+                        alert(data.message || 'Error al cargar información del lote');
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);

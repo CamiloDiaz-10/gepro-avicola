@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HasFincaScope;
 
 class Mortalidad extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFincaScope;
 
     protected $table = 'mortalidad';
     protected $primaryKey = 'IDMortalidad';

@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class ReportController extends Controller
 {
@@ -25,12 +30,27 @@ class ReportController extends Controller
     {
         $filters = [
             'finca' => $request->integer('finca'),
+            'lote' => $request->integer('lote'),
             'desde' => $request->input('desde'),
             'hasta' => $request->input('hasta'),
         ];
         $ownerFincas = $this->isOwnerContext($request) ? $this->userFincaIds($request) : null;
         if ($ownerFincas && $filters['finca'] && !$ownerFincas->contains($filters['finca'])) {
             $filters['finca'] = null; // evitar filtrar por una finca no permitida
+        }
+
+        // Obtener lotes según finca seleccionada o fincas del usuario
+        $lotes = collect();
+        if (Schema::hasTable('lotes')) {
+            if ($filters['finca']) {
+                $lotes = DB::table('lotes')->where('IDFinca', $filters['finca'])
+                    ->select('IDLote', 'Nombre')->orderBy('Nombre')->get();
+            } elseif ($ownerFincas) {
+                $lotes = DB::table('lotes')->whereIn('IDFinca', $ownerFincas)
+                    ->select('IDLote', 'Nombre')->orderBy('Nombre')->get();
+            } else {
+                $lotes = DB::table('lotes')->select('IDLote', 'Nombre')->orderBy('Nombre')->get();
+            }
         }
 
         $data = [
@@ -44,46 +64,165 @@ class ReportController extends Controller
                     ? DB::table('fincas')->whereIn('IDFinca', $ownerFincas)->select('IDFinca','Nombre','Ubicacion')->orderBy('Nombre')->get()
                     : DB::table('fincas')->select('IDFinca','Nombre','Ubicacion')->orderBy('Nombre')->get())
                 : collect(),
+            'lotes' => $lotes,
         ];
 
         return view('admin.reports.index', $data);
     }
 
-    // EXPORTS
-    public function exportProduction(Request $request): StreamedResponse
+    // EXPORTS TO EXCEL
+    public function exportProduction(Request $request)
     {
         $ownerFincas = $this->isOwnerContext($request) ? $this->userFincaIds($request) : null;
-        $rows = $this->getProductionReport($this->makeFilters($request), $ownerFincas)['daily'];
-        return $this->streamCsv('produccion.csv', ['Fecha','CantidadHuevos'], function($out) use ($rows) {
-            foreach ($rows as $r) fputcsv($out, [$r->date, $r->total]);
-        });
+        $data = $this->getProductionReport($this->makeFilters($request), $ownerFincas);
+        
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Producción Huevos');
+        
+        // Headers
+        $sheet->setCellValue('A1', 'Fecha');
+        $sheet->setCellValue('B1', 'Cantidad Huevos');
+        $this->styleHeader($sheet, 'A1:B1');
+        
+        // Data
+        $row = 2;
+        foreach ($data['daily'] as $item) {
+            $sheet->setCellValue('A'.$row, $item->date);
+            $sheet->setCellValue('B'.$row, $item->total);
+            $row++;
+        }
+        
+        // Top Lotes
+        $sheet->setCellValue('D1', 'Top 10 Lotes');
+        $sheet->setCellValue('E1', 'Total Producción');
+        $this->styleHeader($sheet, 'D1:E1');
+        
+        $row = 2;
+        foreach ($data['by_lot'] as $item) {
+            $sheet->setCellValue('D'.$row, $item->lote);
+            $sheet->setCellValue('E'.$row, $item->total);
+            $row++;
+        }
+        
+        $this->autoSizeColumns($sheet, ['A', 'B', 'D', 'E']);
+        return $this->downloadExcel($spreadsheet, 'Reporte_Produccion_'.date('Y-m-d').'.xlsx');
     }
 
-    public function exportFeeding(Request $request): StreamedResponse
+    public function exportFeeding(Request $request)
     {
         $ownerFincas = $this->isOwnerContext($request) ? $this->userFincaIds($request) : null;
-        $rows = $this->getFeedingReport($this->makeFilters($request), $ownerFincas)['by_type'];
-        return $this->streamCsv('alimentacion.csv', ['TipoAlimento','CantidadKg'], function($out) use ($rows) {
-            foreach ($rows as $r) fputcsv($out, [$r->feed_type, $r->total]);
-        });
+        $data = $this->getFeedingReport($this->makeFilters($request), $ownerFincas);
+        
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Alimentación');
+        
+        // Headers por tipo
+        $sheet->setCellValue('A1', 'Tipo de Alimento');
+        $sheet->setCellValue('B1', 'Cantidad (Kg)');
+        $this->styleHeader($sheet, 'A1:B1');
+        
+        // Data
+        $row = 2;
+        foreach ($data['by_type'] as $item) {
+            $sheet->setCellValue('A'.$row, $item->feed_type);
+            $sheet->setCellValue('B'.$row, $item->total);
+            $row++;
+        }
+        
+        // Consumo diario
+        $sheet->setCellValue('D1', 'Fecha');
+        $sheet->setCellValue('E1', 'Kg Consumidos');
+        $this->styleHeader($sheet, 'D1:E1');
+        
+        $row = 2;
+        foreach ($data['daily'] as $item) {
+            $sheet->setCellValue('D'.$row, $item->date);
+            $sheet->setCellValue('E'.$row, $item->total);
+            $row++;
+        }
+        
+        $this->autoSizeColumns($sheet, ['A', 'B', 'D', 'E']);
+        return $this->downloadExcel($spreadsheet, 'Reporte_Alimentacion_'.date('Y-m-d').'.xlsx');
     }
 
-    public function exportHealth(Request $request): StreamedResponse
+    public function exportHealth(Request $request)
     {
         $ownerFincas = $this->isOwnerContext($request) ? $this->userFincaIds($request) : null;
-        $rows = $this->getHealthReport($this->makeFilters($request), $ownerFincas)['treatments'];
-        return $this->streamCsv('salud.csv', ['Tratamiento','Total'], function($out) use ($rows) {
-            foreach ($rows as $r) fputcsv($out, [$r->treatment, $r->total]);
-        });
+        $data = $this->getHealthReport($this->makeFilters($request), $ownerFincas);
+        
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Salud');
+        
+        // Headers tratamientos
+        $sheet->setCellValue('A1', 'Tipo de Tratamiento');
+        $sheet->setCellValue('B1', 'Total Aplicaciones');
+        $this->styleHeader($sheet, 'A1:B1');
+        
+        // Data
+        $row = 2;
+        foreach ($data['treatments'] as $item) {
+            $sheet->setCellValue('A'.$row, $item->treatment);
+            $sheet->setCellValue('B'.$row, $item->total);
+            $row++;
+        }
+        
+        // Tratamientos recientes
+        $sheet->setCellValue('D1', 'Lote');
+        $sheet->setCellValue('E1', 'Tratamiento');
+        $sheet->setCellValue('F1', 'Fecha');
+        $this->styleHeader($sheet, 'D1:F1');
+        
+        $row = 2;
+        foreach ($data['recent'] as $item) {
+            $sheet->setCellValue('D'.$row, $item->lote);
+            $sheet->setCellValue('E'.$row, $item->TipoTratamiento);
+            $sheet->setCellValue('F'.$row, $item->Fecha);
+            $row++;
+        }
+        
+        $this->autoSizeColumns($sheet, ['A', 'B', 'D', 'E', 'F']);
+        return $this->downloadExcel($spreadsheet, 'Reporte_Salud_'.date('Y-m-d').'.xlsx');
     }
 
-    public function exportFinance(Request $request): StreamedResponse
+    public function exportFinance(Request $request)
     {
         $ownerFincas = $this->isOwnerContext($request) ? $this->userFincaIds($request) : null;
-        $rows = $this->getFinanceReport($this->makeFilters($request), $ownerFincas)['movements'];
-        return $this->streamCsv('finanzas.csv', ['Fecha','TipoMovimiento','Cantidad'], function($out) use ($rows) {
-            foreach ($rows as $r) fputcsv($out, [$r->Fecha, $r->TipoMovimiento, $r->total]);
-        });
+        $data = $this->getFinanceReport($this->makeFilters($request), $ownerFincas);
+        
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Finanzas');
+        
+        // Headers
+        $sheet->setCellValue('A1', 'Fecha');
+        $sheet->setCellValue('B1', 'Tipo de Movimiento');
+        $sheet->setCellValue('C1', 'Cantidad');
+        $this->styleHeader($sheet, 'A1:C1');
+        
+        // Data
+        $row = 2;
+        foreach ($data['movements'] as $item) {
+            $sheet->setCellValue('A'.$row, $item->Fecha);
+            $sheet->setCellValue('B'.$row, $item->TipoMovimiento);
+            $sheet->setCellValue('C'.$row, $item->total);
+            $row++;
+        }
+        
+        // Totales
+        $sheet->setCellValue('E1', 'Resumen');
+        $sheet->setCellValue('F1', 'Total');
+        $this->styleHeader($sheet, 'E1:F1');
+        
+        $sheet->setCellValue('E2', 'Total Ventas');
+        $sheet->setCellValue('F2', $data['totals']['ventas']);
+        $sheet->setCellValue('E3', 'Total Compras');
+        $sheet->setCellValue('F3', $data['totals']['compras']);
+        
+        $this->autoSizeColumns($sheet, ['A', 'B', 'C', 'E', 'F']);
+        return $this->downloadExcel($spreadsheet, 'Reporte_Finanzas_'.date('Y-m-d').'.xlsx');
     }
 
     // HELPERS
@@ -91,21 +230,53 @@ class ReportController extends Controller
     {
         return [
             'finca' => $request->integer('finca'),
+            'lote' => $request->integer('lote'),
             'desde' => $request->input('desde'),
             'hasta' => $request->input('hasta'),
         ];
     }
 
-    private function streamCsv(string $filename, array $headers, \Closure $writer): StreamedResponse
+    private function styleHeader($sheet, $range)
     {
-        return response()->streamDownload(function() use ($headers, $writer) {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, $headers);
-            $writer($out);
-            fclose($out);
+        $sheet->getStyle($range)->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+                'size' => 12
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '2563EB'] // Blue 600
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000']
+                ]
+            ]
+        ]);
+    }
+
+    private function autoSizeColumns($sheet, array $columns)
+    {
+        foreach ($columns as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+    }
+
+    private function downloadExcel($spreadsheet, $filename)
+    {
+        $writer = new Xlsx($spreadsheet);
+        
+        return response()->streamDownload(function() use ($writer) {
+            $writer->save('php://output');
         }, $filename, [
-            'Content-Type' => 'text/csv',
-            'Cache-Control' => 'no-store, no-cache',
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Cache-Control' => 'max-age=0',
         ]);
     }
 
@@ -120,7 +291,9 @@ class ReportController extends Controller
         $q = DB::table('produccion_huevos')->select('Fecha as date', DB::raw('SUM(CantidadHuevos) as total'));
         if ($filters['desde']) $q->where('Fecha', '>=', $filters['desde']);
         if ($filters['hasta']) $q->where('Fecha', '<=', $filters['hasta']);
-        if ($filters['finca'] || $ownerFincas) {
+        if ($filters['lote']) {
+            $q->where('produccion_huevos.IDLote', $filters['lote']);
+        } elseif ($filters['finca'] || $ownerFincas) {
             $q->join('lotes','produccion_huevos.IDLote','=','lotes.IDLote');
             if ($filters['finca']) $q->where('lotes.IDFinca', $filters['finca']);
             if ($ownerFincas) $q->whereIn('lotes.IDFinca', $ownerFincas);
@@ -132,6 +305,7 @@ class ReportController extends Controller
             ->select('l.Nombre as lote', DB::raw('SUM(ph.CantidadHuevos) as total'))
             ->when($filters['desde'], fn($qq)=>$qq->where('ph.Fecha','>=',$filters['desde']))
             ->when($filters['hasta'], fn($qq)=>$qq->where('ph.Fecha','<=',$filters['hasta']))
+            ->when($filters['lote'], fn($qq)=>$qq->where('ph.IDLote',$filters['lote']))
             ->when($filters['finca'], fn($qq)=>$qq->where('l.IDFinca',$filters['finca']))
             ->when($ownerFincas, fn($qq)=>$qq->whereIn('l.IDFinca', $ownerFincas))
             ->groupBy('l.Nombre')
@@ -153,6 +327,7 @@ class ReportController extends Controller
             ->join('tipo_alimentos as t','a.IDTipoAlimento','=','t.IDTipoAlimento')
             ->when($filters['desde'], fn($q)=>$q->where('a.Fecha','>=',$filters['desde']))
             ->when($filters['hasta'], fn($q)=>$q->where('a.Fecha','<=',$filters['hasta']))
+            ->when($filters['lote'], fn($q)=>$q->where('a.IDLote',$filters['lote']))
             ->when($filters['finca'] || $ownerFincas, function($q) use ($filters, $ownerFincas){
                 $q->join('lotes as l','a.IDLote','=','l.IDLote');
                 if ($filters['finca']) $q->where('l.IDFinca',$filters['finca']);
@@ -166,6 +341,7 @@ class ReportController extends Controller
         $daily = DB::table('alimentacion as a')
             ->when($filters['desde'], fn($q)=>$q->where('a.Fecha','>=',$filters['desde']))
             ->when($filters['hasta'], fn($q)=>$q->where('a.Fecha','<=',$filters['hasta']))
+            ->when($filters['lote'], fn($q)=>$q->where('a.IDLote',$filters['lote']))
             ->when($filters['finca'] || $ownerFincas, function($q) use ($filters, $ownerFincas){
                 $q->join('lotes as l','a.IDLote','=','l.IDLote');
                 if ($filters['finca']) $q->where('l.IDFinca',$filters['finca']);
@@ -189,6 +365,7 @@ class ReportController extends Controller
         $treatments = DB::table('sanidad as s')
             ->when($filters['desde'], fn($q)=>$q->where('s.Fecha','>=',$filters['desde']))
             ->when($filters['hasta'], fn($q)=>$q->where('s.Fecha','<=',$filters['hasta']))
+            ->when($filters['lote'], fn($q)=>$q->where('s.IDLote',$filters['lote']))
             ->when($filters['finca'] || $ownerFincas, function($q) use ($filters, $ownerFincas){
                 $q->join('lotes as l','s.IDLote','=','l.IDLote');
                 if ($filters['finca']) $q->where('l.IDFinca',$filters['finca']);
@@ -202,6 +379,7 @@ class ReportController extends Controller
         $recent = DB::table('sanidad as s')
             ->join('lotes as l','s.IDLote','=','l.IDLote')
             ->select('l.Nombre as lote','s.TipoTratamiento','s.Fecha')
+            ->when($filters['lote'], fn($q)=>$q->where('s.IDLote',$filters['lote']))
             ->when($filters['finca'], fn($q)=>$q->where('l.IDFinca',$filters['finca']))
             ->when($ownerFincas, fn($q)=>$q->whereIn('l.IDFinca',$ownerFincas))
             ->orderByDesc('s.Fecha')
@@ -222,6 +400,7 @@ class ReportController extends Controller
             ->join('lotes as l','m.IDLote','=','l.IDLote')
             ->when($filters['desde'], fn($q)=>$q->where('m.Fecha','>=',$filters['desde']))
             ->when($filters['hasta'], fn($q)=>$q->where('m.Fecha','<=',$filters['hasta']))
+            ->when($filters['lote'], fn($q)=>$q->where('m.IDLote',$filters['lote']))
             ->when($filters['finca'], fn($q)=>$q->where('l.IDFinca',$filters['finca']))
             ->when($ownerFincas, fn($q)=>$q->whereIn('l.IDFinca',$ownerFincas))
             ->select('m.Fecha','m.TipoMovimiento', DB::raw('COUNT(*) as total'))

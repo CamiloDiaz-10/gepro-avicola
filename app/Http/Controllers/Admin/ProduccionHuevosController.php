@@ -25,12 +25,24 @@ class ProduccionHuevosController extends Controller
         return ($request->routeIs('employee.*')) || ($user && $user->role && $user->role->NombreRol === 'Empleado');
     }
 
+    /**
+     * Verifica si el usuario necesita filtrado por fincas (no es admin)
+     */
+    private function needsFincaFilter(Request $request): bool
+    {
+        $user = $request->user();
+        if (!$user) return false;
+        
+        // Admin no necesita filtro, propietarios y empleados SÍ
+        return !$user->hasRole('Administrador');
+    }
+
     private function permittedLotIds(Request $request)
     {
         $user = $request->user();
         if (!$user) return collect();
 
-        // Lotes pertenecientes a las fincas asignadas al usuario (empleado)
+        // Lotes pertenecientes a las fincas asignadas al usuario (propietario o empleado)
         $fincaIds = $user->fincas()->pluck('fincas.IDFinca');
         if ($fincaIds->isEmpty()) return collect();
 
@@ -47,7 +59,8 @@ class ProduccionHuevosController extends Controller
         $query = ProduccionHuevos::with(['lote'])
             ->whereBetween('Fecha', [$from, $to]);
 
-        if ($this->isEmployeeContext($request)) {
+        // Filtrar por fincas asignadas (propietarios y empleados)
+        if ($this->needsFincaFilter($request)) {
             $allowedLotIds = $this->permittedLotIds($request);
             $query->whereIn('IDLote', $allowedLotIds);
         }
@@ -66,7 +79,7 @@ class ProduccionHuevosController extends Controller
             DB::raw('SUM(CantidadHuevos) as total_huevos'),
             DB::raw('SUM(HuevosRotos) as total_rotos')
         )->whereBetween('Fecha', [$from, $to])
-         ->when($this->isEmployeeContext($request), function($q) use ($request) {
+         ->when($this->needsFincaFilter($request), function($q) use ($request) {
              $q->whereIn('IDLote', $this->permittedLotIds($request));
          })
          ->when($loteId, fn($q) => $q->where('IDLote', $loteId))
@@ -81,7 +94,7 @@ class ProduccionHuevosController extends Controller
         // Producción diaria para gráfico
         $serieDiaria = ProduccionHuevos::select('Fecha', DB::raw('SUM(CantidadHuevos) as total'))
             ->whereBetween('Fecha', [$from, $to])
-            ->when($this->isEmployeeContext($request), function($q) use ($request) {
+            ->when($this->needsFincaFilter($request), function($q) use ($request) {
                 $q->whereIn('IDLote', $this->permittedLotIds($request));
             })
             ->when($loteId, fn($q) => $q->where('IDLote', $loteId))
@@ -93,7 +106,7 @@ class ProduccionHuevosController extends Controller
         // Mejores y peores días
         $mejoresDias = ProduccionHuevos::select('Fecha', DB::raw('SUM(CantidadHuevos) as total'))
             ->whereBetween('Fecha', [$from, $to])
-            ->when($this->isEmployeeContext($request), function($q) use ($request) {
+            ->when($this->needsFincaFilter($request), function($q) use ($request) {
                 $q->whereIn('IDLote', $this->permittedLotIds($request));
             })
             ->when($loteId, fn($q) => $q->where('IDLote', $loteId))
@@ -105,7 +118,7 @@ class ProduccionHuevosController extends Controller
 
         $peoresDias = ProduccionHuevos::select('Fecha', DB::raw('SUM(CantidadHuevos) as total'))
             ->whereBetween('Fecha', [$from, $to])
-            ->when($this->isEmployeeContext($request), function($q) use ($request) {
+            ->when($this->needsFincaFilter($request), function($q) use ($request) {
                 $q->whereIn('IDLote', $this->permittedLotIds($request));
             })
             ->when($loteId, fn($q) => $q->where('IDLote', $loteId))
@@ -115,11 +128,76 @@ class ProduccionHuevosController extends Controller
             ->limit(3)
             ->get();
 
-        if ($this->isEmployeeContext($request)) {
+        // Estadísticas por lote: Mayor y menor producción
+        $produccionPorLote = ProduccionHuevos::select(
+                'IDLote', 
+                DB::raw('SUM(CantidadHuevos) as total_producido'),
+                DB::raw('AVG(CantidadHuevos) as promedio_diario'),
+                DB::raw('COUNT(*) as dias_registrados')
+            )
+            ->whereBetween('Fecha', [$from, $to])
+            ->when($this->needsFincaFilter($request), function($q) use ($request) {
+                $q->whereIn('IDLote', $this->permittedLotIds($request));
+            })
+            ->when($turno, fn($q) => $q->where('Turno', $turno))
+            ->groupBy('IDLote')
+            ->having('total_producido', '>', 0)
+            ->get();
+
+        // Obtener lote con mayor y menor producción
+        // Solo si hay al menos 2 lotes diferentes para comparar
+        $mejorLote = null;
+        $peorLote = null;
+        
+        if ($produccionPorLote->count() >= 2) {
+            // Ordenar por producción total
+            $lotesOrdenados = $produccionPorLote->sortByDesc('total_producido')->values();
+            
+            // Lote con MAYOR producción (primero después de ordenar descendente)
+            $mejorLoteData = $lotesOrdenados->first();
+            $mejorLote = Lote::with('finca')->find($mejorLoteData->IDLote);
+            if ($mejorLote) {
+                $mejorLote->total_producido = $mejorLoteData->total_producido;
+                $mejorLote->promedio_diario = round($mejorLoteData->promedio_diario, 2);
+                $mejorLote->dias_registrados = $mejorLoteData->dias_registrados;
+            }
+            
+            // Lote con MENOR producción (último después de ordenar descendente)
+            $peorLoteData = $lotesOrdenados->last();
+            $peorLote = Lote::with('finca')->find($peorLoteData->IDLote);
+            if ($peorLote) {
+                $peorLote->total_producido = $peorLoteData->total_producido;
+                $peorLote->promedio_diario = round($peorLoteData->promedio_diario, 2);
+                $peorLote->dias_registrados = $peorLoteData->dias_registrados;
+            }
+            
+            // Verificar que no sean el mismo lote (por si acaso)
+            if ($mejorLote && $peorLote && $mejorLote->IDLote === $peorLote->IDLote) {
+                // Si es el mismo lote, no mostrar ninguno
+                $mejorLote = null;
+                $peorLote = null;
+            }
+        }
+
+        // Lista de lotes para el dropdown (filtrados por fincas asignadas y excluyendo engorde)
+        if ($this->needsFincaFilter($request)) {
             $allowedLotIds = $this->permittedLotIds($request);
-            $lotes = Lote::whereIn('IDLote', $allowedLotIds)->orderBy('Nombre')->get(['IDLote','Nombre']);
+            $lotes = Lote::with('gallinas.tipoGallina')
+                ->whereIn('IDLote', $allowedLotIds)
+                ->get()
+                ->filter(function($lote) {
+                    return $lote->puede_producir_huevos;
+                })
+                ->sortBy('Nombre')
+                ->values();
         } else {
-            $lotes = Lote::orderBy('Nombre')->get(['IDLote','Nombre']);
+            $lotes = Lote::with('gallinas.tipoGallina')
+                ->get()
+                ->filter(function($lote) {
+                    return $lote->puede_producir_huevos;
+                })
+                ->sortBy('Nombre')
+                ->values();
         }
 
         return view('admin.produccion_huevos.index', [
@@ -136,17 +214,35 @@ class ProduccionHuevosController extends Controller
             'serieDiaria' => $serieDiaria,
             'mejoresDias' => $mejoresDias,
             'peoresDias' => $peoresDias,
+            'mejorLote' => $mejorLote,
+            'peorLote' => $peorLote,
+            'produccionPorLote' => $produccionPorLote,
         ]);
     }
 
     public function create(Request $request)
     {
-        if ($this->isEmployeeContext($request)) {
+        // Lista de lotes filtrados por fincas asignadas y excluyendo lotes de engorde
+        if ($this->needsFincaFilter($request)) {
             $allowedLotIds = $this->permittedLotIds($request);
-            $lotes = Lote::whereIn('IDLote', $allowedLotIds)->orderBy('Nombre')->get(['IDLote','Nombre']);
+            $lotes = Lote::with(['gallinas.tipoGallina', 'finca'])
+                ->whereIn('IDLote', $allowedLotIds)
+                ->orderBy('Nombre')
+                ->get()
+                ->filter(function($lote) {
+                    return $lote->puede_producir_huevos;
+                })
+                ->values();
         } else {
-            $lotes = Lote::orderBy('Nombre')->get(['IDLote','Nombre']);
+            $lotes = Lote::with(['gallinas.tipoGallina', 'finca'])
+                ->orderBy('Nombre')
+                ->get()
+                ->filter(function($lote) {
+                    return $lote->puede_producir_huevos;
+                })
+                ->values();
         }
+        
         $hoy = Carbon::now()->toDateString();
 
         return view('admin.produccion_huevos.create', [
@@ -163,7 +259,8 @@ class ProduccionHuevosController extends Controller
             // Por defecto, si no viene Fecha del request, usar hoy
             $data['Fecha'] = $data['Fecha'] ?? Carbon::now()->toDateString();
 
-            if ($this->isEmployeeContext($request)) {
+            // Verificar acceso al lote (propietarios y empleados)
+            if ($this->needsFincaFilter($request)) {
                 $allowedLotIds = $this->permittedLotIds($request);
                 if (!$allowedLotIds->contains($data['IDLote'])) {
                     return back()->withInput()->with('error', 'No tienes permiso para registrar producción en este lote.');
@@ -172,7 +269,13 @@ class ProduccionHuevosController extends Controller
 
             ProduccionHuevos::create($data);
 
-            $redirect = $this->isEmployeeContext($request) ? 'employee.produccion-huevos.index' : 'admin.produccion-huevos.index';
+            // Redirigir según el contexto del usuario
+            $redirect = 'admin.produccion-huevos.index';
+            if ($this->isOwnerContext($request)) {
+                $redirect = 'owner.produccion-huevos.index';
+            } elseif ($this->isEmployeeContext($request)) {
+                $redirect = 'employee.produccion-huevos.index';
+            }
             return redirect()
                 ->route($redirect)
                 ->with('success', 'Producción de huevos registrada correctamente.');
@@ -196,10 +299,13 @@ class ProduccionHuevosController extends Controller
 
         $rows = ProduccionHuevos::with('lote')
             ->whereBetween('Fecha', [$from, $to])
+            ->when($this->needsFincaFilter($request), function($q) use ($request) {
+                $q->whereIn('IDLote', $this->permittedLotIds($request));
+            })
             ->when($loteId, fn($q) => $q->where('IDLote', $loteId))
             ->when($turno, fn($q) => $q->where('Turno', $turno))
             ->orderBy('Fecha')
-            ->get([ 'Fecha','IDLote','CantidadHuevos','HuevosRotos','Turno','PesoPromedio','PorcentajePostura','Observaciones' ]);
+            ->get([ 'Fecha','IDLote','CantidadHuevos','HuevosRotos','Turno','PesoPromedio','Observaciones' ]);
 
         $filename = 'produccion_huevos_'.Carbon::now()->format('Ymd_His').'.csv';
 
@@ -213,7 +319,7 @@ class ProduccionHuevosController extends Controller
             // BOM UTF-8 para Excel
             fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($output, [
-                'Fecha','Lote','CantidadHuevos','HuevosRotos','Turno','PesoPromedio','PorcentajePostura','Observaciones'
+                'Fecha','Lote','CantidadHuevos','HuevosRotos','Turno','PesoPromedio','Observaciones'
             ]);
             foreach ($rows as $r) {
                 fputcsv($output, [
@@ -223,7 +329,6 @@ class ProduccionHuevosController extends Controller
                     $r->HuevosRotos,
                     $r->Turno,
                     $r->PesoPromedio,
-                    $r->PorcentajePostura,
                     $r->Observaciones,
                 ]);
             }
