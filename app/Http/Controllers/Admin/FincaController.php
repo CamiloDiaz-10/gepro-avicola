@@ -123,9 +123,34 @@ class FincaController extends Controller
     // Remove the specified resource from storage.
     public function destroy(Finca $finca)
     {
-        $finca->delete();
+        try {
+            $finca->delete();
 
-        return redirect()->route('admin.fincas.index')
-            ->with('success', 'Finca eliminada correctamente.');
+            return redirect()->route('admin.fincas.index')
+                ->with('success', 'Finca eliminada correctamente.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Código SQLSTATE 23000: violación de integridad (FK)
+            if ($e->getCode() === '23000') {
+                $mensaje = 'No se puede eliminar la finca porque tiene registros relacionados.';
+                // Intentar detectar relaciones comunes para mensaje más claro
+                try {
+                    $relaciones = [];
+                    $usuariosAsignados = $finca->users()->count();
+                    if ($usuariosAsignados > 0) { $relaciones[] = 'usuarios asignados'; }
+                    if (\Schema::hasTable('lotes')) {
+                        $lotes = \DB::table('lotes')->where('IDFinca', $finca->IDFinca)->count();
+                        if ($lotes > 0) { $relaciones[] = 'lotes'; }
+                    }
+                    if (!empty($relaciones)) {
+                        $mensaje .= ' Relacionados: ' . implode(', ', $relaciones) . '. Desasigne o elimine esos registros primero.';
+                    }
+                } catch (\Throwable $t) {
+                    // Ignorar detección detallada si falla
+                }
+                return redirect()->route('admin.fincas.index')->with('error', $mensaje);
+            }
+            // Otros errores
+            return redirect()->route('admin.fincas.index')->with('error', 'No se pudo eliminar la finca.');
+        }
     }
 }

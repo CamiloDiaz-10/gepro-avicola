@@ -8,6 +8,8 @@
         $area = 'owner';
     } elseif (\Illuminate\Support\Str::startsWith($current, 'employee.')) {
         $area = 'employee';
+    } elseif (\Illuminate\Support\Str::startsWith($current, 'veterinario.')) {
+        $area = 'veterinario';
     }
 @endphp
 <div class="p-6">
@@ -34,7 +36,7 @@
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Filtros de Búsqueda</h2>
                     <p class="text-gray-500 dark:text-gray-400 text-sm">Busca por nombre, raza o finca</p>
                 </div>
-                @if($area !== 'employee')
+                @if(in_array($area, ['admin','owner']))
                 <a href="{{ route($area.'.lotes.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -100,7 +102,7 @@
                             <td class="px-6 py-4 text-right text-sm">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route($area.'.lotes.show', $lote) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400">Ver</a>
-                                    @if($area !== 'employee')
+                                    @if(in_array($area, ['admin','owner']))
                                     <a href="{{ route($area.'.lotes.edit', $lote) }}" class="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400">Editar</a>
                                     <form action="{{ route($area.'.lotes.destroy', $lote) }}" method="POST" onsubmit="return confirm('¿Eliminar este lote?')">
                                         @csrf

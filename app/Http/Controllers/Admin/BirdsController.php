@@ -23,6 +23,12 @@ class BirdsController extends Controller
         return ($request->routeIs('owner.*')) || ($user && $user->role && $user->role->NombreRol === 'Propietario');
     }
 
+    private function isVeterinarioContext(Request $request): bool
+    {
+        $user = $request->user();
+        return ($request->routeIs('veterinario.*')) || ($user && $user->role && $user->role->NombreRol === 'Veterinario');
+    }
+
     /**
      * Display a gallery of bird images
      *
@@ -64,10 +70,42 @@ class BirdsController extends Controller
         }
 
         $query = Bird::with(['lote', 'tipoGallina']);
+        $permittedLots = collect();
 
-        // Scope for propietario context
-        if ($this->isOwnerContext($request)) {
+        // Scope for propietario/veterinario context
+        $isOwner = $this->isOwnerContext($request);
+        $isVet = $this->isVeterinarioContext($request);
+        if ($isOwner || $isVet) {
             $permittedLots = $this->permittedLotIds($request);
+            // Si no tiene fincas asignadas, no mostrar resultados
+            if ($permittedLots->isEmpty()) {
+                $birds = collect();
+                $lotes = collect();
+                $tipos = TipoGallina::orderBy('Nombre')->get(['IDTipoGallina','Nombre']);
+                return view('admin.aves.index', [
+                    'birds' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15),
+                    'lotes' => $lotes,
+                    'tipos' => $tipos,
+                    'filters' => [
+                        'lote' => $loteId,
+                        'tipo' => $tipoId,
+                        'estado' => $estado,
+                        'born_from' => $bornFrom,
+                        'born_to' => $bornTo,
+                    ],
+                    'stats' => [
+                        'total' => 0,
+                        'by_status' => collect(),
+                        'recent' => 0,
+                        'by_type' => collect(),
+                    ],
+                    'charts' => [
+                        'births_series' => collect(),
+                        'status' => collect(),
+                        'types' => collect(),
+                    ],
+                ]);
+            }
             $query->whereIn('IDLote', $permittedLots);
         }
 
@@ -79,30 +117,49 @@ class BirdsController extends Controller
 
         $birds = $query->orderByDesc('IDGallina')->paginate(15)->withQueryString();
 
-        // Stats
-        $total = Bird::count();
-        $byStatus = Bird::getBirdsByStatus();
-        $recent = Bird::getRecentAcquisitions(7);
+        // Stats (filtrar por contexto owner/veterinario)
+        $statsBase = Bird::query();
+        if (($isOwner || $isVet) && $permittedLots->isNotEmpty()) {
+            $statsBase->whereIn('IDLote', $permittedLots);
+        }
+        $total = (clone $statsBase)->count();
+        $byStatus = ($isOwner || $isVet)
+            ? (clone $statsBase)->select('Estado', DB::raw('COUNT(*) as total'))->groupBy('Estado')->get()
+            : Bird::getBirdsByStatus();
+        $recent = ($isOwner || $isVet)
+            ? (clone $statsBase)->where('created_at', '>=', Carbon::now()->subDays(7))->count()
+            : Bird::getRecentAcquisitions(7);
         // Conteo por tipo con nombre
-        $byType = Bird::with('tipoGallina')
-            ->select('IDTipoGallina', DB::raw('COUNT(*) as total'))
-            ->groupBy('IDTipoGallina')
-            ->get();
+        $byType = ($isOwner || $isVet)
+            ? (clone $statsBase)->with('tipoGallina')
+                ->select('IDTipoGallina', DB::raw('COUNT(*) as total'))
+                ->groupBy('IDTipoGallina')
+                ->get()
+            : Bird::with('tipoGallina')
+                ->select('IDTipoGallina', DB::raw('COUNT(*) as total'))
+                ->groupBy('IDTipoGallina')
+                ->get();
 
-        // Serie: nacimientos por día en el rango
-        $birthsSeries = Bird::select('FechaNacimiento as date', DB::raw('COUNT(*) as total'))
+        // Serie: nacimientos por día en el rango (con filtro por contexto si aplica)
+        $birthsSeriesQuery = Bird::select('FechaNacimiento as date', DB::raw('COUNT(*) as total'))
             ->whereBetween('FechaNacimiento', [$bornFrom, $bornTo])
             ->when($loteId, fn($q) => $q->where('IDLote', $loteId))
             ->when($tipoId, fn($q) => $q->where('IDTipoGallina', $tipoId))
             ->when($estado, fn($q) => $q->where('Estado', $estado))
+            ->when(($isOwner || $isVet) && $permittedLots->isNotEmpty(), function($q) use ($permittedLots) {
+                return $q->whereIn('IDLote', $permittedLots);
+            })
             ->groupBy('FechaNacimiento')
             ->orderBy('FechaNacimiento')
             ->get();
+        $birthsSeries = $birthsSeriesQuery;
 
-        // Limit lotes list when propietario
-        if ($this->isOwnerContext($request)) {
+        // Limit lotes list when propietario/veterinario
+        if ($isOwner || $isVet) {
             $permittedLots = $this->permittedLotIds($request);
-            $lotes = Lote::whereIn('IDLote', $permittedLots)->orderBy('Nombre')->get(['IDLote','Nombre']);
+            $lotes = $permittedLots->isNotEmpty()
+                ? Lote::whereIn('IDLote', $permittedLots)->orderBy('Nombre')->get(['IDLote','Nombre'])
+                : collect();
         } else {
             $lotes = Lote::orderBy('Nombre')->get(['IDLote','Nombre']);
         }

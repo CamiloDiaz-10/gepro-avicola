@@ -116,6 +116,17 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400">Consulta información de aves</p>
                 </div>
             </a>
+
+            <a href="{{ route('veterinario.aves.scan') }}" 
+               class="flex items-center p-4 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-lg transition-colors border border-transparent hover:border-indigo-300 dark:hover:border-indigo-700">
+                <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                    <i class="fas fa-qrcode text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Escanear QR de Ave</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Abrir escáner para ver detalles</p>
+                </div>
+            </a>
         </div>
     </div>
 

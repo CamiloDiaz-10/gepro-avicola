@@ -178,6 +178,32 @@
                 </a>
             </li>
 
+            <!-- Gestión de Tratamientos / Sanidad (Admin) -->
+            <li>
+                <a href="{{ route('admin.sanidad.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.sanidad.index') || request()->routeIs('admin.sanidad.edit') || request()->routeIs('admin.sanidad.show') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-notes-medical text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Tratamientos (Sanidad)
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Tratamientos (Sanidad)</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('admin.sanidad.create') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.sanidad.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Tratamiento
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Tratamiento</span>
+                </a>
+            </li>
+
             <li>
                 <a href="{{ route('admin.reports.index') }}" 
                    class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('admin.reports.*') ? 'bg-blue-800' : '' }}"
@@ -486,6 +512,58 @@
                         Gestión de Aves
                     </span>
                     <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Gestión de Aves</span>
+                </a>
+            </li>
+
+            <!-- Veterinario: Lotes (solo lectura) -->
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Lotes
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('veterinario.lotes.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('veterinario.lotes.index') || request()->routeIs('veterinario.lotes.show') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-layer-group text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Ver Lotes
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Ver Lotes</span>
+                </a>
+            </li>
+
+            <!-- Veterinario: Sanidad / Tratamientos -->
+            <li>
+                <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
+                     :class="sidebarCollapsed && window.innerWidth >= 768 ? 'hidden' : ''">
+                    Sanidad
+                </div>
+            </li>
+            <li>
+                <a href="{{ route('veterinario.sanidad.index') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('veterinario.sanidad.index') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-notes-medical text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Tratamientos de Salud
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Tratamientos de Salud</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('veterinario.sanidad.create') }}" 
+                   class="flex items-center p-2.5 sm:p-3 text-white rounded-md hover:bg-blue-800 transition-all duration-200 relative tooltip {{ request()->routeIs('veterinario.sanidad.create') ? 'bg-blue-800' : '' }}"
+                   :class="sidebarCollapsed && window.innerWidth >= 768 ? 'justify-center' : ''">
+                    <i class="fas fa-plus-circle text-base sm:text-lg" :class="sidebarCollapsed && window.innerWidth >= 768 ? '' : 'mr-2 sm:mr-3'"></i>
+                    <span class="text-sm sm:text-base transition-opacity duration-300" 
+                          :class="sidebarCollapsed && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                        Registrar Tratamiento
+                    </span>
+                    <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Tratamiento</span>
                 </a>
             </li>
             @endif

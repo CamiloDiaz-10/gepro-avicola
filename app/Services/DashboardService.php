@@ -17,13 +17,8 @@ class DashboardService
         $user = auth()->user();
         $role = $user && $user->role ? $user->role->NombreRol : null;
 
-        // Verificar si el usuario tiene fincas asignadas (excepto admin)
-        if ($role !== 'Administrador' && $user && !$user->hasFincasAsignadas()) {
-            return [
-                'error' => 'sin_fincas',
-                'message' => 'No tienes fincas asignadas'
-            ];
-        }
+        // Nota: Si el usuario no tiene fincas asignadas, devolvemos estadísticas en cero
+        // en lugar de bloquear el dashboard. Los módulos de escritura se protegen con middleware.
 
         $base = [
             'users' => $this->getUserStatistics(),
@@ -36,6 +31,9 @@ class DashboardService
         // Agregar estadísticas específicas por rol
         if ($role === 'Empleado' || $role === 'Propietario') {
             $base = array_merge($base, $this->getAssignedFarmsStatistics());
+        }
+        if ($role === 'Veterinario') {
+            $base = array_merge($base, $this->getVeterinarioStatistics());
         }
 
         return $base;
@@ -179,6 +177,69 @@ class DashboardService
         return [
             'byType' => [],
             'lowStock' => []
+        ];
+    }
+
+    /**
+     * Estadísticas específicas para el dashboard del Veterinario
+     * - feedingRecords: cantidad de registros de alimentación del mes actual en sus fincas
+     * - activeLots: cantidad de lotes con aves activas en sus fincas
+     * - monthlyConsumption: suma (Kg) de alimentación en el mes actual en sus fincas
+     */
+    protected function getVeterinarioStatistics(): array
+    {
+        $user = auth()->user();
+        $feedingRecords = 0;
+        $activeLots = 0;
+        $monthlyConsumption = 0.0;
+
+        if (!$user) {
+            return compact('feedingRecords','activeLots','monthlyConsumption');
+        }
+
+        try {
+            // Obtener fincas asignadas
+            $fincaIds = $user->getFincaIds();
+            if (empty($fincaIds)) {
+                return compact('feedingRecords','activeLots','monthlyConsumption');
+            }
+
+            // Registros de alimentación del mes actual
+            if (Schema::hasTable('alimentacion') && Schema::hasTable('lotes')) {
+                $feedingRecords = DB::table('alimentacion as a')
+                    ->join('lotes as l','a.IDLote','=','l.IDLote')
+                    ->whereIn('l.IDFinca', $fincaIds)
+                    ->whereBetween('a.Fecha', [now()->startOfMonth(), now()])
+                    ->count();
+
+                // Consumo mensual (Kg)
+                $monthlyConsumption = (float) DB::table('alimentacion as a')
+                    ->join('lotes as l','a.IDLote','=','l.IDLote')
+                    ->whereIn('l.IDFinca', $fincaIds)
+                    ->whereBetween('a.Fecha', [now()->startOfMonth(), now()])
+                    ->sum('a.CantidadKg');
+            }
+
+            // Lotes activos (con al menos una ave activa)
+            if (Schema::hasTable('lotes') && Schema::hasTable('gallinas')) {
+                $activeLots = DB::table('lotes as l')
+                    ->join('gallinas as g','g.IDLote','=','l.IDLote')
+                    ->whereIn('l.IDFinca', $fincaIds)
+                    ->where(function($q) {
+                        $q->whereRaw("LOWER(TRIM(COALESCE(g.Estado,''))) = 'activa'")
+                          ->orWhereRaw("LOWER(TRIM(COALESCE(g.Estado,''))) = 'activo'");
+                    })
+                    ->distinct('l.IDLote')
+                    ->count('l.IDLote');
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Error obteniendo estadísticas de veterinario: ' . $e->getMessage());
+        }
+
+        return [
+            'feedingRecords' => (int) $feedingRecords,
+            'activeLots' => (int) $activeLots,
+            'monthlyConsumption' => (float) $monthlyConsumption,
         ];
     }
 

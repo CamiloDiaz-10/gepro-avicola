@@ -46,14 +46,27 @@
 
 <div class="p-6">
     <div class="max-w-5xl mx-auto space-y-6">
+        @php
+            $current = Route::currentRouteName();
+            $area = 'admin';
+            if (\Illuminate\Support\Str::startsWith($current, 'owner.')) {
+                $area = 'owner';
+            } elseif (\Illuminate\Support\Str::startsWith($current, 'employee.')) {
+                $area = 'employee';
+            } elseif (\Illuminate\Support\Str::startsWith($current, 'veterinario.')) {
+                $area = 'veterinario';
+            }
+        @endphp
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Lote: {{ $lote->Nombre }}</h1>
                 <p class="text-gray-600 dark:text-gray-300">Detalles del lote</p>
             </div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.lotes.edit', $lote) }}" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Editar</a>
-                <a href="{{ route('admin.lotes.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-500">Volver</a>
+                @if(in_array($area, ['admin','owner']))
+                <a href="{{ route($area.'.lotes.edit', $lote) }}" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Editar</a>
+                @endif
+                <a href="{{ route($area.'.lotes.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-500">Volver</a>
             </div>
         </div>
 
@@ -271,15 +284,19 @@
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                <form action="{{ route('admin.aves.destroy', $gallina->IDGallina) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de eliminar esta ave del lote? Esta acción no se puede deshacer.');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium text-sm transition-colors" title="Eliminar ave">
-                                                        <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </form>
+                                                @if(in_array($area, ['admin','owner']))
+                                                    <form action="{{ route('admin.aves.destroy', $gallina->IDGallina) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de eliminar esta ave del lote? Esta acción no se puede deshacer.');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium text-sm transition-colors" title="Eliminar ave">
+                                                            <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <span class="text-xs text-gray-400 dark:text-gray-500">—</span>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -298,6 +315,7 @@
                 </div>
             </div>
 
+            @if(in_array($area, ['admin','owner']))
             <div class="space-y-6">
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Acciones</h2>
@@ -308,6 +326,7 @@
                     </form>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>
