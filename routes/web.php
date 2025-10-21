@@ -116,6 +116,19 @@ Route::middleware('auth')->group(function () {
         Route::put('/update', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     });
+
+    // Rutas específicas para propietarios (Propietario)
+    Route::middleware(['role:Propietario'])->prefix('owner')->name('owner.')->group(function () {
+        // Sanidad / Tratamientos (Propietario)
+        Route::get('sanidad', [\App\Http\Controllers\Admin\SanidadController::class, 'index'])->name('sanidad.index');
+        Route::middleware('check.finca')->group(function () {
+            Route::get('sanidad/create', [\App\Http\Controllers\Admin\SanidadController::class, 'create'])->name('sanidad.create');
+            Route::post('sanidad', [\App\Http\Controllers\Admin\SanidadController::class, 'store'])->name('sanidad.store');
+            Route::get('sanidad/{sanidad}/edit', [\App\Http\Controllers\Admin\SanidadController::class, 'edit'])->name('sanidad.edit');
+            Route::put('sanidad/{sanidad}', [\App\Http\Controllers\Admin\SanidadController::class, 'update'])->name('sanidad.update');
+            Route::delete('sanidad/{sanidad}', [\App\Http\Controllers\Admin\SanidadController::class, 'destroy'])->name('sanidad.destroy');
+        });
+    });
     
     // Rutas específicas para administradores
     Route::middleware(['role:Administrador'])->prefix('admin')->name('admin.')->group(function () {

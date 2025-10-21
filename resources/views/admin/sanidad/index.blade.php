@@ -11,14 +11,14 @@
         <p class="text-gray-600 dark:text-gray-300">Gestione y filtre los registros de tratamientos</p>
       </div>
       @if(auth()->check() && method_exists(auth()->user(), 'hasFincasAsignadas') && auth()->user()->hasFincasAsignadas())
-        <a href="{{ route(request()->routeIs('veterinario.*') ? 'veterinario.sanidad.create' : 'admin.sanidad.create') }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+        <a href="{{ route(request()->routeIs('veterinario.*') ? 'veterinario.sanidad.create' : (request()->routeIs('owner.*') ? 'owner.sanidad.create' : 'admin.sanidad.create')) }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
           <i class="fas fa-heartbeat mr-2"></i>Nuevo Tratamiento
         </a>
       @endif
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
-      <form method="GET" action="{{ route(request()->routeIs('veterinario.*') ? 'veterinario.sanidad.index' : 'admin.sanidad.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <form method="GET" action="{{ route(request()->routeIs('veterinario.*') ? 'veterinario.sanidad.index' : (request()->routeIs('owner.*') ? 'owner.sanidad.index' : 'admin.sanidad.index')) }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">Tipo</label>
           <select name="tipo" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md">
@@ -78,8 +78,8 @@
             <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">{{ $t->Dosis ?? '—' }}</td>
             <td class="px-4 py-2 text-sm text-right">
               <div class="inline-flex gap-2">
-                <a href="{{ route(request()->routeIs('veterinario.*') ? 'veterinario.sanidad.edit' : 'admin.sanidad.edit', $t->IDSanidad) }}" class="text-blue-600 hover:text-blue-800">Editar</a>
-                <form method="POST" action="{{ route(request()->routeIs('veterinario.*') ? 'veterinario.sanidad.destroy' : 'admin.sanidad.destroy', $t->IDSanidad) }}" onsubmit="return confirm('¿Eliminar este tratamiento?');">
+                <a href="{{ route(request()->routeIs('veterinario.*') ? 'veterinario.sanidad.edit' : (request()->routeIs('owner.*') ? 'owner.sanidad.edit' : 'admin.sanidad.edit'), $t->IDSanidad) }}" class="text-blue-600 hover:text-blue-800">Editar</a>
+                <form method="POST" action="{{ route(request()->routeIs('veterinario.*') ? 'veterinario.sanidad.destroy' : (request()->routeIs('owner.*') ? 'owner.sanidad.destroy' : 'admin.sanidad.destroy'), $t->IDSanidad) }}" onsubmit="return confirm('¿Eliminar este tratamiento?');">
                   @csrf
                   @method('DELETE')
                   <button class="text-red-600 hover:text-red-800">Eliminar</button>
