@@ -159,7 +159,7 @@
                     @if($bird->UrlImagen && file_exists(public_path('storage/' . $bird->UrlImagen)))
                         <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-transform duration-300 hover:scale-105">
                             <div class="relative cursor-pointer" 
-                                 onclick="openLightbox('{{ asset('storage/' . $bird->UrlImagen) }}', '{{ $bird->IDGallina }}', '{{ $bird->IDLote }}', {{ $index }})">
+                                 onclick="openLightbox('{{ asset('storage/' . $bird->UrlImagen) }}', '{{ $bird->IDGallina }}', '{{ optional($bird->lote)->Nombre ?? $bird->IDLote }}', {{ $index }})">
                                 <img src="{{ asset('storage/' . $bird->UrlImagen) }}" 
                                      alt="Ave #{{ $bird->IDGallina }}" 
                                      class="w-full h-48 object-cover">
@@ -169,7 +169,7 @@
                                     ID: {{ $bird->IDGallina }}
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    Lote: {{ $bird->IDLote }}
+                                    Lote: {{ optional($bird->lote)->Nombre ?? $bird->IDLote }}
                                 </p>
                             </div>
                         </div>
@@ -184,7 +184,7 @@
                                     ID: {{ $bird->IDGallina }}
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    Lote: {{ $bird->IDLote }}
+                                    Lote: {{ optional($bird->lote)->Nombre ?? $bird->IDLote }}
                                 </p>
                             </div>
                         </div>

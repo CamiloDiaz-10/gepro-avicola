@@ -36,9 +36,11 @@ class BirdsController extends Controller
      */
     public function gallery()
     {
-        $birds = Bird::whereNotNull('UrlImagen')
+        $birds = Bird::with('lote')
+            ->whereNotNull('UrlImagen')
             ->where('UrlImagen', '!=', '')
             ->orderBy('IDLote')
+            ->orderBy('IDGallina')
             ->paginate(20); // Show 20 birds per page
 
         return view('admin.birds.gallery', [
