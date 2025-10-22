@@ -64,6 +64,7 @@
                 </a>
             </li>
 
+            @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Propietario')
             <!-- Owner: Sanidad / Tratamientos -->
             <li>
                 <div class="px-3 py-2 text-xs font-semibold text-blue-300 dark:text-gray-400 uppercase tracking-wider"
@@ -95,6 +96,7 @@
                     <span class="tooltip-text" x-show="sidebarCollapsed && window.innerWidth >= 768">Registrar Tratamiento</span>
                 </a>
             </li>
+            @endif
 
             <!-- Opciones específicas para Administradores -->
             @if(auth()->check() && auth()->user()->role && auth()->user()->role->NombreRol === 'Administrador')
@@ -249,8 +251,6 @@
                 </a>
             </li>
 
-            <li>
-                
             
             <!-- Producción de Huevos: Reportes -->
             <li>
